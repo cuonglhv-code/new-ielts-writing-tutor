@@ -1,204 +1,281 @@
 'use client'
 
-import { useState } from 'react'
-import type { Tip } from '@/lib/types'
+import { useMemo, useState } from 'react'
+import type { GuideBand, GuideCriterion, GuideData, GuideTask } from './types'
 
-const CATEGORY_ICONS: Record<string, string> = {
-  'Task 1 Structure':              '\u{1F4CA}',
-  'Task 2 Argument Development':   '\u270D\uFE0F',
-  'Vocabulary':                    '\u{1F4DA}',
-  'Grammar':                       '\u{1F524}',
-  'Time Management':               '\u23F1\uFE0F',
+function getBandOrder(bands: Record<string, GuideBand>): string[] {
+  return Object.keys(bands).sort((a, b) => Number(a) - Number(b))
 }
 
-const TASK_FILTER_OPTIONS = [
-  { label: 'Tất cả', value: 'all' },
-  { label: 'Task 1', value: '1' },
-  { label: 'Task 2', value: '2' },
-]
-
-const TOPIC_OPTIONS = [
-  { label: 'Tất cả chủ đề', value: 'all' },
-  { label: 'Task Achievement', value: 'task_achievement' },
-  { label: 'Coherence & Cohesion', value: 'coherence' },
-  { label: 'Vocabulary', value: 'vocabulary' },
-  { label: 'Grammar', value: 'grammar' },
-  { label: 'Cấu trúc bài', value: 'structure' },
-  { label: 'Quản lý thời gian', value: 'time' },
-]
-
-function renderMarkdown(text: string): string {
-  const lines = text.split('\n')
-  const parts: string[] = []
-  let inBulletList = false
-  let inOrderedList = false
-
-  const closeOpenList = () => {
-    if (inBulletList)  { parts.push('</ul>'); inBulletList = false }
-    if (inOrderedList) { parts.push('</ol>'); inOrderedList = false }
-  }
-
-  for (const rawLine of lines) {
-    const trimmed = rawLine.trim()
-    const boldLine = trimmed.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-
-    if (trimmed.startsWith('\u2611')) {
-      if (!inBulletList) { closeOpenList(); parts.push('<ul class="space-y-1 my-1">'); inBulletList = true }
-      parts.push(`<li class="flex gap-2 items-start"><span class="text-emerald-500 flex-shrink-0 mt-0.5">\u2611</span><span>${boldLine.slice(1).trim()}</span></li>`)
-    } else if (trimmed.startsWith('- ') || trimmed.startsWith('\u2022 ')) {
-      if (!inBulletList) { closeOpenList(); parts.push('<ul class="space-y-1 my-1">'); inBulletList = true }
-      const content = boldLine.slice(2).trim()
-      parts.push(`<li class="flex gap-2 items-start"><span class="text-indigo-400 flex-shrink-0 mt-0.5 select-none">&bull;</span><span>${content}</span></li>`)
-    } else if (trimmed.match(/^\d+\.\s/)) {
-      if (!inOrderedList) { closeOpenList(); parts.push('<ol class="space-y-1 my-1">'); inOrderedList = true }
-      const num = trimmed.match(/^(\d+)/)![1]
-      const rest = trimmed.replace(/^\d+\.\s*/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      parts.push(`<li class="flex gap-2 items-start"><span class="text-gray-400 flex-shrink-0 font-mono text-xs mt-0.5">${num}.</span><span>${rest}</span></li>`)
-    } else {
-      closeOpenList()
-      if (trimmed === '') {
-        parts.push('<div class="h-2"></div>')
-      } else {
-        parts.push(`<p class="leading-relaxed">${boldLine}</p>`)
-      }
-    }
-  }
-
-  closeOpenList()
-  return parts.join('')
+function getCriteriaLabel(code: string, taskId: string): string {
+  if (code === 'TA' && taskId === 'task1') return 'Task Achievement'
+  if (code === 'TR' && taskId === 'task2') return 'Task Response'
+  if (code === 'CC') return 'Coherence & Cohesion'
+  if (code === 'LR') return 'Lexical Resource'
+  if (code === 'GRA') return 'Grammar Range & Accuracy'
+  return code
 }
 
-export default function TipsClient({ tips }: { tips: Tip[] }) {
-  const [taskFilter, setTaskFilter]   = useState('all')
-  const [topicFilter, setTopicFilter] = useState('all')
-  const [search, setSearch]           = useState('')
+function getUpgradeItems(criterion: GuideCriterion): string[] {
+  return [
+    ...(criterion.upgradeTo6 ?? []),
+    ...(criterion.upgradeTo7 ?? []),
+    ...(criterion.upgradeTo8 ?? []),
+    ...(criterion.upgradeTo9 ?? []),
+    ...(criterion.maintain ?? []),
+  ]
+}
 
-  const filtered = tips.filter((tip) => {
-    if (taskFilter === '1' && tip.task_filter !== 1) return false
-    if (taskFilter === '2' && tip.task_filter !== 2) return false
-    if (topicFilter !== 'all' && tip.topic_tag !== topicFilter) return false
-    if (search) {
-      const q = search.toLowerCase()
-      if (!tip.title.toLowerCase().includes(q) && !tip.content.toLowerCase().includes(q)) return false
-    }
-    return true
+function bandMatchesQuery(task: GuideTask, bandKey: string, query: string): boolean {
+  if (!query) return true
+  const q = query.toLowerCase()
+  const band = task.bands[bandKey]
+  if (band.summary.toLowerCase().includes(q)) return true
+
+  for (const [criterionKey, criterion] of Object.entries(band.criteria)) {
+    if (criterionKey.toLowerCase().includes(q)) return true
+    if (criterion.keyPhrase.toLowerCase().includes(q)) return true
+    if (getUpgradeItems(criterion).some((line) => line.toLowerCase().includes(q))) return true
+  }
+
+  return false
+}
+
+function bundleMatchesQuery(task: GuideTask, query: string): boolean {
+  if (!query) return true
+  const q = query.toLowerCase()
+  return task.tipBundles.some((bundle) => {
+    if (bundle.label.toLowerCase().includes(q)) return true
+    if (bundle.bandTarget.toLowerCase().includes(q)) return true
+    return bundle.tips.some((tip) => tip.toLowerCase().includes(q))
   })
+}
 
-  // Group by category
-  const ORDER = [
-    'Task 1 Structure',
-    'Task 2 Argument Development',
-    'Vocabulary',
-    'Grammar',
-    'Time Management',
-  ]
-  const grouped: Record<string, Tip[]> = {}
-  for (const tip of filtered) {
-    if (!grouped[tip.category]) grouped[tip.category] = []
-    grouped[tip.category].push(tip)
+export default function TipsClient({ data }: { data: GuideData }) {
+  const [activeTask, setActiveTask] = useState(data.tasks[0]?.id ?? 'task1')
+  const [selectedBand, setSelectedBand] = useState('all')
+  const [search, setSearch] = useState('')
+
+  const currentTask = useMemo(
+    () => data.tasks.find((task) => task.id === activeTask) ?? data.tasks[0],
+    [data.tasks, activeTask]
+  )
+
+  const bandOrder = useMemo(
+    () => (currentTask ? getBandOrder(currentTask.bands) : []),
+    [currentTask]
+  )
+
+  const visibleBands = useMemo(() => {
+    if (!currentTask) return []
+    return bandOrder.filter((bandKey) => {
+      if (selectedBand !== 'all' && selectedBand !== bandKey) return false
+      return bandMatchesQuery(currentTask, bandKey, search)
+    })
+  }, [currentTask, bandOrder, selectedBand, search])
+
+  const visibleBundles = useMemo(() => {
+    if (!currentTask) return []
+    if (!search) return currentTask.tipBundles
+    const q = search.toLowerCase()
+    return currentTask.tipBundles.filter((bundle) => {
+      if (bundle.label.toLowerCase().includes(q)) return true
+      if (bundle.bandTarget.toLowerCase().includes(q)) return true
+      return bundle.tips.some((tip) => tip.toLowerCase().includes(q))
+    })
+  }, [currentTask, search])
+
+  if (!currentTask) {
+    return (
+      <div className="card p-6 text-sm text-gray-600">
+        Tips data is unavailable. Please check `IELTS-Writing-Guide.md`.
+      </div>
+    )
   }
-  const categories = [
-    ...ORDER.filter((c) => grouped[c]),
-    ...Object.keys(grouped).filter((c) => !ORDER.includes(c)),
-  ]
+
+  const matchCount = visibleBands.length + (bundleMatchesQuery(currentTask, search) ? visibleBundles.length : 0)
 
   return (
-    <div>
-      {/* Search + filters */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Tìm kiếm mẹo học\u2026"
-          className="input-field flex-1 text-sm"
-        />
-        <div className="flex gap-2 flex-wrap">
-          {TASK_FILTER_OPTIONS.map((o) => (
+    <div className="space-y-8">
+      <section className="relative overflow-hidden rounded-2xl border border-slate-200 bg-gradient-to-r from-slate-900 via-indigo-900 to-blue-900 text-white p-6 sm:p-8">
+        <div className="relative z-10">
+          <p className="text-xs uppercase tracking-[0.18em] text-slate-200">IELTS Writing Mastery</p>
+          <h1 className="mt-2 text-2xl sm:text-3xl font-bold">IELTS Writing Tips & Band Guide</h1>
+          <p className="mt-3 text-sm sm:text-base text-slate-200 max-w-3xl">
+            Writing is scored by TA/TR, CC, LR, and GRA in both tasks. Task 2 carries double weight, so keep Task 1
+            efficient and build deeper argument quality in Task 2.
+          </p>
+          <div className="mt-5 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs sm:text-sm">
+            <div className="rounded-lg bg-white/10 p-3 border border-white/20">
+              <p className="font-semibold">4 Criteria</p>
+              <p className="text-slate-200 mt-1">TA/TR, CC, LR, GRA</p>
+            </div>
+            <div className="rounded-lg bg-white/10 p-3 border border-white/20">
+              <p className="font-semibold">Task Weighting</p>
+              <p className="text-slate-200 mt-1">Task 2 = 2x Task 1</p>
+            </div>
+            <div className="rounded-lg bg-white/10 p-3 border border-white/20">
+              <p className="font-semibold">Focus</p>
+              <p className="text-slate-200 mt-1">Find your band gap, then drill upgrades</p>
+            </div>
+          </div>
+        </div>
+        <div className="absolute -right-16 -top-16 h-52 w-52 rounded-full bg-cyan-300/20 blur-2xl" />
+      </section>
+
+      <section className="card p-4 sm:p-5 space-y-4">
+        <div className="flex flex-wrap gap-2">
+          {data.tasks.map((task) => (
             <button
-              key={o.value}
-              onClick={() => setTaskFilter(o.value)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
-                taskFilter === o.value
+              key={task.id}
+              onClick={() => {
+                setActiveTask(task.id)
+                setSelectedBand('all')
+              }}
+              className={`px-4 py-2 rounded-full text-sm font-semibold border transition-colors ${
+                activeTask === task.id
                   ? 'bg-indigo-600 text-white border-indigo-600'
-                  : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
+                  : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-400'
               }`}
             >
-              {o.label}
+              {task.label}
             </button>
           ))}
         </div>
-      </div>
 
-      {/* Topic tags */}
-      <div className="flex flex-wrap gap-2 mb-8">
-        {TOPIC_OPTIONS.map((o) => (
+        <div className="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3">
+          <input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by band, criterion, or tip..."
+            className="input-field"
+          />
+          <div className="text-xs sm:text-sm text-gray-500 sm:text-right self-center">
+            {search ? `${matchCount} matching sections` : 'Browse by band or drill bundle'}
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-xl font-bold text-gray-900">Band Ladder</h2>
+          <span className="text-xs text-gray-500">Choose one band or view all</span>
+        </div>
+        <div className="flex gap-2 overflow-x-auto pb-1">
           <button
-            key={o.value}
-            onClick={() => setTopicFilter(o.value)}
-            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-              topicFilter === o.value
-                ? 'bg-violet-600 text-white border-violet-600'
-                : 'bg-white text-gray-600 border-gray-300 hover:border-violet-400'
+            onClick={() => setSelectedBand('all')}
+            className={`px-3 py-2 rounded-lg text-sm border whitespace-nowrap ${
+              selectedBand === 'all'
+                ? 'bg-slate-900 text-white border-slate-900'
+                : 'bg-white text-gray-700 border-gray-300 hover:border-slate-500'
             }`}
           >
-            {o.label}
+            All Bands
           </button>
-        ))}
-      </div>
-
-      {categories.length === 0 ? (
-        <div className="card p-12 text-center text-gray-400">
-          <p>Không tìm thấy mẹo học phù hợp.</p>
-        </div>
-      ) : (
-        <div className="space-y-12">
-          {categories.map((cat) => (
-            <section key={cat} id={cat.replace(/\s+/g, '-').toLowerCase()}>
-              <div className="flex items-center gap-3 mb-5">
-                <span className="text-2xl">{CATEGORY_ICONS[cat] ?? '\u{1F4CC}'}</span>
-                <h2 className="text-xl font-bold text-gray-900">{cat}</h2>
-              </div>
-              <div className="space-y-4">
-                {grouped[cat].map((tip) => (
-                  <article key={tip.id} className="card p-6">
-                    <div className="flex items-start justify-between gap-4 mb-3">
-                      <h3 className="text-base font-semibold text-gray-900">{tip.title}</h3>
-                      <div className="flex gap-1.5 flex-shrink-0">
-                        {tip.task_filter === 1 && (
-                          <span className="badge bg-indigo-100 text-indigo-700">Task 1</span>
-                        )}
-                        {tip.task_filter === 2 && (
-                          <span className="badge bg-emerald-100 text-emerald-700">Task 2</span>
-                        )}
-                        {tip.topic_tag && (
-                          <span className="badge bg-gray-100 text-gray-600">{tip.topic_tag}</span>
-                        )}
-                      </div>
-                    </div>
-                    <div
-                      className="text-sm text-gray-700 leading-relaxed space-y-1 [&_ul]:space-y-1 [&_li]:leading-relaxed [&_strong]:font-semibold [&_strong]:text-gray-900"
-                      dangerouslySetInnerHTML={{ __html: renderMarkdown(tip.content) }}
-                    />
-                    {tip.source_url && (
-                      <div className="mt-4 pt-3 border-t border-gray-100">
-                        <a
-                          href={tip.source_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-gray-400 hover:text-indigo-600 transition-colors"
-                        >
-                          Source: {tip.source_title ?? tip.source_url}
-                        </a>
-                      </div>
-                    )}
-                  </article>
-                ))}
-              </div>
-            </section>
+          {bandOrder.map((bandKey) => (
+            <button
+              key={bandKey}
+              onClick={() => setSelectedBand(bandKey)}
+              className={`px-3 py-2 rounded-lg text-sm border whitespace-nowrap ${
+                selectedBand === bandKey
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-gray-700 border-gray-300 hover:border-indigo-500'
+              }`}
+            >
+              Band {bandKey}
+            </button>
           ))}
         </div>
-      )}
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-xl font-bold text-gray-900">Band Cards</h2>
+        {visibleBands.length === 0 ? (
+          <div className="card p-8 text-sm text-gray-500">No band cards match your search.</div>
+        ) : (
+          visibleBands.map((bandKey) => {
+            const band = currentTask.bands[bandKey]
+            return (
+              <details key={bandKey} className="card p-5 group" open={selectedBand !== 'all'}>
+                <summary className="list-none cursor-pointer">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-xs font-semibold text-indigo-600 uppercase tracking-wider">
+                        {currentTask.label}
+                      </p>
+                      <h3 className="text-lg font-bold text-gray-900 mt-1">Band {bandKey}</h3>
+                    </div>
+                    <span className="text-xs font-medium text-gray-500 group-open:text-indigo-600">
+                      Tap to {selectedBand !== 'all' ? 'collapse' : 'expand'}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-gray-600">{band.summary}</p>
+                </summary>
+
+                <div className="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {Object.entries(band.criteria).map(([criterionCode, criterion]) => {
+                    const nextMoves = getUpgradeItems(criterion)
+                    return (
+                      <article key={criterionCode} className="rounded-xl border border-gray-200 p-4 bg-gray-50/60">
+                        <div className="flex items-center justify-between gap-2">
+                          <h4 className="text-sm font-bold text-gray-900">
+                            {criterionCode} · {getCriteriaLabel(criterionCode, currentTask.id)}
+                          </h4>
+                        </div>
+                        <p className="mt-2 text-sm text-gray-700">{criterion.keyPhrase}</p>
+                        {nextMoves.length > 0 && (
+                          <div className="mt-3">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                              How to move up
+                            </p>
+                            <ul className="mt-2 space-y-1.5">
+                              {nextMoves.map((move, idx) => (
+                                <li key={idx} className="text-sm text-gray-700 flex gap-2">
+                                  <span className="text-indigo-500 mt-0.5">•</span>
+                                  <span>{move}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </article>
+                    )
+                  })}
+                </div>
+              </details>
+            )
+          })
+        )}
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-xl font-bold text-gray-900">Tips & Drills</h2>
+        {visibleBundles.length === 0 ? (
+          <div className="card p-8 text-sm text-gray-500">No tip bundles match your search.</div>
+        ) : (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+            {visibleBundles.map((bundle) => (
+              <article key={bundle.id} className="card p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-base font-bold text-gray-900">{bundle.label}</h3>
+                  <span className="badge bg-indigo-100 text-indigo-700">{bundle.bandTarget}</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">Target: {currentTask.label}</p>
+                <ul className="mt-3 space-y-2">
+                  {bundle.tips.map((tip, idx) => (
+                    <li key={idx} className="text-sm text-gray-700 flex gap-2">
+                      <span className="text-indigo-500 mt-0.5">•</span>
+                      <span>{tip}</span>
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
     </div>
   )
 }
+
