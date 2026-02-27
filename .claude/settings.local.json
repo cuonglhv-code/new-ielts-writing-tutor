@@ -6,7 +6,12 @@
       "Bash(npm run build)",
       "Bash(git add package.json package-lock.json next.config.js tailwind.config.ts tsconfig.json postcss.config.js .env.example .gitignore DEPLOYMENT.md middleware.ts src/ supabase/)",
       "Bash(git commit:*)",
-      "Bash(node -e \":*)"
+      "Bash(node -e \":*)",
+      "Bash(npm install pdf-parse --save-dev)",
+      "Bash(python3 -c \":*)",
+      "Bash(python3 -c \"import pypdf; print\\(''pypdf ok''\\)\")",
+      "Bash(python3 -m pip install pypdf)",
+      "Bash(npm run import-tips)"
     ]
   }
 }
