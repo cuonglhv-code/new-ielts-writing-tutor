@@ -19,15 +19,16 @@ Assess the essay on these four criteria:
 Rules:
 - Band scores are given in 0.5 increments from 1.0 to 9.0
 - Be strict and honest; do not inflate scores
-- Provide 3-5 sentences of holistic feedback per criterion in "feedback"
-- For each criterion in "criteria_detail", give 2-3 specific strengths and 2-3 specific improvements (short, punchy bullet phrases)
-- Identify 2-3 overall strengths (holistic, cross-criterion)
-- Identify 2-3 prioritised areas for improvement (holistic)
-- Write next_steps as 3 concrete, actionable steps the student can take immediately
-- Write examiner_comment as a brief holistic summary (2-3 sentences)
-- In model_improvements, optionally provide a revised introduction and 1-3 improved sentence examples drawn from the essay
+- Provide 3-5 sentences of holistic feedback per criterion in "feedback" (English) and "feedback_vi" (Vietnamese)
+- For each criterion in "criteria_detail", give 2-3 specific strengths and 2-3 specific improvements in English ("strengths", "improvements") and Vietnamese ("strengths_vi", "improvements_vi")
+- Identify 2-3 overall strengths in English ("strengths") and Vietnamese ("strengths_vi")
+- Identify 2-3 prioritised areas for improvement in English ("areas_for_improvement") and Vietnamese ("areas_for_improvement_vi")
+- Write next_steps as 3 concrete, actionable steps in English ("next_steps") and Vietnamese ("next_steps_vi")
+- Write examiner_comment as a brief holistic summary (2-3 sentences) in English ("examiner_comment") and Vietnamese ("examiner_comment_vi")
+- In model_improvements, optionally provide a revised introduction and 1-3 improved sentence examples drawn from the essay (English only -- the student needs to see accurate English models)
 - Never invent content or data not present in the essay; never provide a full model essay
-- Feedback tone must be professional, neutral, and encouraging
+- Feedback tone must be professional, neutral, and encouraging -- like a senior IELTS examiner
+- Vietnamese translations must be natural and professional, not machine-translated; keep IELTS technical terms in English (e.g. Task Achievement, Coherence and Cohesion, Lexical Resource, band score, overview, paraphrase)
 
 You MUST respond with ONLY a valid JSON object in exactly this format -- no markdown, no extra text:
 {
@@ -39,39 +40,57 @@ You MUST respond with ONLY a valid JSON object in exactly this format -- no mark
     "grammatical_range": <number>
   },
   "feedback": {
-    "task_achievement": "<3-5 sentence string>",
-    "coherence_cohesion": "<3-5 sentence string>",
-    "lexical_resource": "<3-5 sentence string>",
-    "grammatical_range": "<3-5 sentence string>"
+    "task_achievement": "<3-5 sentence string in English>",
+    "coherence_cohesion": "<3-5 sentence string in English>",
+    "lexical_resource": "<3-5 sentence string in English>",
+    "grammatical_range": "<3-5 sentence string in English>"
+  },
+  "feedback_vi": {
+    "task_achievement": "<3-5 câu nhận xét bằng tiếng Việt>",
+    "coherence_cohesion": "<3-5 câu nhận xét bằng tiếng Việt>",
+    "lexical_resource": "<3-5 câu nhận xét bằng tiếng Việt>",
+    "grammatical_range": "<3-5 câu nhận xét bằng tiếng Việt>"
   },
   "criteria_detail": {
     "task_achievement": {
       "band": <number>,
-      "strengths": ["<string>", "<string>"],
-      "improvements": ["<string>", "<string>"]
+      "strengths": ["<English>", "<English>"],
+      "strengths_vi": ["<Tiếng Việt>", "<Tiếng Việt>"],
+      "improvements": ["<English>", "<English>"],
+      "improvements_vi": ["<Tiếng Việt>", "<Tiếng Việt>"]
     },
     "coherence_cohesion": {
       "band": <number>,
-      "strengths": ["<string>", "<string>"],
-      "improvements": ["<string>", "<string>"]
+      "strengths": ["<English>", "<English>"],
+      "strengths_vi": ["<Tiếng Việt>", "<Tiếng Việt>"],
+      "improvements": ["<English>", "<English>"],
+      "improvements_vi": ["<Tiếng Việt>", "<Tiếng Việt>"]
     },
     "lexical_resource": {
       "band": <number>,
-      "strengths": ["<string>", "<string>"],
-      "improvements": ["<string>", "<string>"]
+      "strengths": ["<English>", "<English>"],
+      "strengths_vi": ["<Tiếng Việt>", "<Tiếng Việt>"],
+      "improvements": ["<English>", "<English>"],
+      "improvements_vi": ["<Tiếng Việt>", "<Tiếng Việt>"]
     },
     "grammatical_range": {
       "band": <number>,
-      "strengths": ["<string>", "<string>"],
-      "improvements": ["<string>", "<string>"]
+      "strengths": ["<English>", "<English>"],
+      "strengths_vi": ["<Tiếng Việt>", "<Tiếng Việt>"],
+      "improvements": ["<English>", "<English>"],
+      "improvements_vi": ["<Tiếng Việt>", "<Tiếng Việt>"]
     }
   },
-  "strengths": ["<string>", "<string>"],
-  "areas_for_improvement": ["<string>", "<string>"],
-  "examiner_comment": "<string>",
-  "next_steps": ["<step 1>", "<step 2>", "<step 3>"],
+  "strengths": ["<English>", "<English>"],
+  "strengths_vi": ["<Tiếng Việt>", "<Tiếng Việt>"],
+  "areas_for_improvement": ["<English>", "<English>"],
+  "areas_for_improvement_vi": ["<Tiếng Việt>", "<Tiếng Việt>"],
+  "examiner_comment": "<English string>",
+  "examiner_comment_vi": "<Chuỗi tiếng Việt>",
+  "next_steps": ["<English step 1>", "<English step 2>", "<English step 3>"],
+  "next_steps_vi": ["<Bước 1 tiếng Việt>", "<Bước 2 tiếng Việt>", "<Bước 3 tiếng Việt>"],
   "model_improvements": {
-    "revised_intro": "<optional improved version of the introduction paragraph>",
+    "revised_intro": "<optional improved version of the introduction paragraph in English>",
     "revised_sentence_examples": ["<improved sentence 1>", "<improved sentence 2>"]
   }
 }`
@@ -135,7 +154,7 @@ ${question.question_text}`
     try {
       const message = await anthropic.messages.create({
         model: 'claude-sonnet-4-6',
-        max_tokens: 4096,
+        max_tokens: 6000,
         system: SYSTEM_PROMPT,
         messages: [{ role: 'user', content: userMessage }],
       })
@@ -168,11 +187,16 @@ ${question.question_text}`
     const {
       band_scores,
       feedback,
+      feedback_vi,
       criteria_detail,
       strengths,
+      strengths_vi,
       areas_for_improvement,
+      areas_for_improvement_vi,
       examiner_comment,
+      examiner_comment_vi,
       next_steps,
+      next_steps_vi,
       model_improvements,
     } = raw
 
@@ -182,11 +206,16 @@ ${question.question_text}`
       overall_band: overallBand,
       band_scores,
       feedback,
+      feedback_vi,
       criteria_detail,
       strengths: strengths ?? [],
+      strengths_vi: strengths_vi ?? [],
       areas_for_improvement: areas_for_improvement ?? [],
+      areas_for_improvement_vi: areas_for_improvement_vi ?? [],
       examiner_comment: examiner_comment ?? '',
+      examiner_comment_vi: examiner_comment_vi ?? '',
       next_steps: next_steps ?? [],
+      next_steps_vi: next_steps_vi ?? [],
       model_improvements: model_improvements ?? {},
     }
 
@@ -220,11 +249,16 @@ ${question.question_text}`
       overall_band: overallBand,
       band_scores,
       feedback,
+      feedback_vi,
       criteria_detail,
       strengths,
+      strengths_vi,
       areas_for_improvement,
+      areas_for_improvement_vi,
       examiner_comment,
+      examiner_comment_vi,
       next_steps,
+      next_steps_vi,
       model_improvements,
     })
   } catch (err) {
