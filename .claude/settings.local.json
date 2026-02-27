@@ -11,7 +11,9 @@
       "Bash(python3 -c \":*)",
       "Bash(python3 -c \"import pypdf; print\\(''pypdf ok''\\)\")",
       "Bash(python3 -m pip install pypdf)",
-      "Bash(npm run import-tips)"
+      "Bash(npm run import-tips)",
+      "Bash(git remote add new-repo https://github.com/cuonglhv-code/new-jaxtina-writing-tutor.git)",
+      "Bash(git push new-repo main)"
     ]
   }
 }

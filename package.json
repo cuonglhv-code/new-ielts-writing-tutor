@@ -9,7 +9,8 @@
     "lint": "next lint",
     "import-questions": "tsx scripts/import-questions.ts",
     "scrape-tips": "tsx scripts/scrape-tips.ts",
-    "import-tips": "tsx scripts/import-tips-local.ts"
+    "import-tips": "tsx scripts/import-tips-local.ts",
+    "create-test-accounts": "tsx scripts/create-test-accounts.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
