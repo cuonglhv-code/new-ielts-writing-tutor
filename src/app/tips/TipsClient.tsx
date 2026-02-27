@@ -149,7 +149,7 @@ export default function TipsClient({ tips }: { tips: Tip[] }) {
 
       {categories.length === 0 ? (
         <div className="card p-12 text-center text-gray-400">
-          <p>No tips match your filters.</p>
+          <p>Không tìm thấy mẹo học phù hợp.</p>
         </div>
       ) : (
         <div className="space-y-12">
