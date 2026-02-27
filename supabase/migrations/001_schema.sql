@@ -90,6 +90,18 @@ alter table public.questions enable row level security;
 alter table public.submissions enable row level security;
 alter table public.tips      enable row level security;
 
+-- Helper function: reads the current user's role WITHOUT triggering RLS
+-- (security definer bypasses row-level policies on profiles)
+create or replace function public.get_my_role()
+returns text
+language sql
+security definer
+stable
+set search_path = public
+as $$
+  select role from public.profiles where user_id = auth.uid()
+$$;
+
 -- PROFILES policies
 create policy "Users can view own profile"
   on public.profiles for select
@@ -98,10 +110,7 @@ create policy "Users can view own profile"
 create policy "Teachers can view all profiles"
   on public.profiles for select
   using (
-    exists (
-      select 1 from public.profiles p
-      where p.user_id = auth.uid() and p.role = 'teacher'
-    )
+    public.get_my_role() = 'teacher'
   );
 
 create policy "Users can update own profile"
@@ -126,10 +135,7 @@ create policy "Students can read own submissions, teachers read all"
   to authenticated
   using (
     auth.uid() = student_id
-    or exists (
-      select 1 from public.profiles p
-      where p.user_id = auth.uid() and p.role = 'teacher'
-    )
+    or public.get_my_role() = 'teacher'
   );
 
 -- TIPS policies
