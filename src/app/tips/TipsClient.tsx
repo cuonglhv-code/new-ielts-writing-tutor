@@ -12,40 +12,60 @@ const CATEGORY_ICONS: Record<string, string> = {
 }
 
 const TASK_FILTER_OPTIONS = [
-  { label: 'All tasks', value: 'all' },
-  { label: 'Task 1 only', value: '1' },
-  { label: 'Task 2 only', value: '2' },
+  { label: 'Tất cả', value: 'all' },
+  { label: 'Task 1', value: '1' },
+  { label: 'Task 2', value: '2' },
 ]
 
 const TOPIC_OPTIONS = [
-  { label: 'All topics', value: 'all' },
+  { label: 'Tất cả chủ đề', value: 'all' },
   { label: 'Task Achievement', value: 'task_achievement' },
   { label: 'Coherence & Cohesion', value: 'coherence' },
   { label: 'Vocabulary', value: 'vocabulary' },
   { label: 'Grammar', value: 'grammar' },
-  { label: 'Structure', value: 'structure' },
-  { label: 'Time Management', value: 'time' },
+  { label: 'Cấu trúc bài', value: 'structure' },
+  { label: 'Quản lý thời gian', value: 'time' },
 ]
 
-function renderMarkdown(text: string) {
-  return text
-    .split('\n')
-    .map((line) => {
-      const boldLine = line.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      if (line.startsWith('\u2611')) {
-        return `<li class="flex gap-2 items-start"><span class="text-emerald-500 flex-shrink-0">\u2611</span><span>${boldLine.slice(1).trim()}</span></li>`
+function renderMarkdown(text: string): string {
+  const lines = text.split('\n')
+  const parts: string[] = []
+  let inBulletList = false
+  let inOrderedList = false
+
+  const closeOpenList = () => {
+    if (inBulletList)  { parts.push('</ul>'); inBulletList = false }
+    if (inOrderedList) { parts.push('</ol>'); inOrderedList = false }
+  }
+
+  for (const rawLine of lines) {
+    const trimmed = rawLine.trim()
+    const boldLine = trimmed.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+
+    if (trimmed.startsWith('\u2611')) {
+      if (!inBulletList) { closeOpenList(); parts.push('<ul class="space-y-1 my-1">'); inBulletList = true }
+      parts.push(`<li class="flex gap-2 items-start"><span class="text-emerald-500 flex-shrink-0 mt-0.5">\u2611</span><span>${boldLine.slice(1).trim()}</span></li>`)
+    } else if (trimmed.startsWith('- ') || trimmed.startsWith('\u2022 ')) {
+      if (!inBulletList) { closeOpenList(); parts.push('<ul class="space-y-1 my-1">'); inBulletList = true }
+      const content = boldLine.slice(2).trim()
+      parts.push(`<li class="flex gap-2 items-start"><span class="text-indigo-400 flex-shrink-0 mt-0.5 select-none">&bull;</span><span>${content}</span></li>`)
+    } else if (trimmed.match(/^\d+\.\s/)) {
+      if (!inOrderedList) { closeOpenList(); parts.push('<ol class="space-y-1 my-1">'); inOrderedList = true }
+      const num = trimmed.match(/^(\d+)/)![1]
+      const rest = trimmed.replace(/^\d+\.\s*/, '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      parts.push(`<li class="flex gap-2 items-start"><span class="text-gray-400 flex-shrink-0 font-mono text-xs mt-0.5">${num}.</span><span>${rest}</span></li>`)
+    } else {
+      closeOpenList()
+      if (trimmed === '') {
+        parts.push('<div class="h-2"></div>')
+      } else {
+        parts.push(`<p class="leading-relaxed">${boldLine}</p>`)
       }
-      if (line.startsWith('\u2022') || line.startsWith('-')) {
-        return `<li class="flex gap-2 items-start"><span class="text-indigo-400 flex-shrink-0">\u2022</span><span>${boldLine.slice(1).trim()}</span></li>`
-      }
-      if (line.match(/^\d+\./)) {
-        const rest = line.replace(/^\d+\.\s*/, '')
-        return `<li class="flex gap-2 items-start"><span class="text-gray-400 flex-shrink-0 font-mono text-xs mt-0.5">${line.match(/^\d+/)![0]}.</span><span>${rest.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')}</span></li>`
-      }
-      if (line.trim() === '') return `<div class="h-2"></div>`
-      return `<p>${boldLine}</p>`
-    })
-    .join('')
+    }
+  }
+
+  closeOpenList()
+  return parts.join('')
 }
 
 export default function TipsClient({ tips }: { tips: Tip[] }) {
@@ -90,7 +110,7 @@ export default function TipsClient({ tips }: { tips: Tip[] }) {
           type="search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search tips\u2026"
+          placeholder="Tìm kiếm mẹo học\u2026"
           className="input-field flex-1 text-sm"
         />
         <div className="flex gap-2 flex-wrap">
