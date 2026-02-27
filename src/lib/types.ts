@@ -60,7 +60,9 @@ export interface Feedback {
 export interface CriterionDetail {
   band: number
   strengths: string[]
+  strengths_vi?: string[]
   improvements: string[]
+  improvements_vi?: string[]
 }
 
 export interface AssessmentCriteriaDetail {
@@ -80,11 +82,16 @@ export interface Assessment {
   overall_band: number
   band_scores: BandScores
   feedback: Feedback
+  feedback_vi?: Feedback
   criteria_detail: AssessmentCriteriaDetail
   strengths: string[]
+  strengths_vi?: string[]
   areas_for_improvement: string[]
+  areas_for_improvement_vi?: string[]
   examiner_comment: string
+  examiner_comment_vi?: string
   next_steps: string[]
+  next_steps_vi?: string[]
   model_improvements?: ModelImprovements
 }
 
