@@ -14,11 +14,13 @@ const studentLinks = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/practice', label: 'Practice' },
   { href: '/tips', label: 'IELTS Tips' },
+  { href: '/writing-samples', label: 'Writing Samples' },
 ]
 
 const teacherLinks = [
   { href: '/teacher', label: 'Students' },
   { href: '/tips', label: 'IELTS Tips' },
+  { href: '/writing-samples', label: 'Writing Samples' },
 ]
 
 export default function Navbar({ role, fullName }: NavbarProps) {
