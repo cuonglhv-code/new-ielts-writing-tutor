@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IELTS Vocabulary and Grammar by Band (1-9)</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --card: #ffffff;
+      --text: #122033;
+      --muted: #526277;
+      --line: #d8e1ed;
+      --accent: #2563eb;
+      --accent-soft: #e7efff;
+      --vocab: #0f766e;
+      --grammar: #7c3aed;
+      --shadow: 0 8px 26px rgba(16, 24, 40, 0.06);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: radial-gradient(circle at top right, #eaf1ff 0%, var(--bg) 45%);
+      color: var(--text);
+      line-height: 1.55;
+    }
+
+    .container {
+      width: min(1180px, 100% - 1.6rem);
+      margin: 0 auto;
+      padding: 1rem 0 2.8rem;
+    }
+
+    .page-header {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .page-header h1 {
+      margin: 0;
+      font-size: clamp(1.15rem, 2vw + 0.85rem, 1.8rem);
+      line-height: 1.2;
+    }
+
+    .page-header p {
+      margin: 0.5rem 0 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 900px;
+    }
+
+    .layout {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .band-nav {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 0.9rem;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+    }
+
+    .band-nav button {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: #1d2f48;
+      padding: 0.45rem 0.7rem;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.84rem;
+      cursor: pointer;
+      transition: 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .band-nav button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .band-nav button.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.3);
+    }
+
+    .content {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .filters {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 0.95rem;
+      display: grid;
+      gap: 0.75rem;
+      grid-template-columns: 1fr;
+    }
+
+    .field {
+      display: grid;
+      gap: 0.32rem;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 0.74rem;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    select,
+    input[type="search"] {
+      border: 1px solid #c9d6e7;
+      border-radius: 10px;
+      padding: 0.57rem 0.64rem;
+      font: inherit;
+      font-size: 0.92rem;
+      color: var(--text);
+      background: #fff;
+    }
+
+    select:focus,
+    input[type="search"]:focus {
+      outline: 2px solid rgba(37, 99, 235, 0.24);
+      border-color: var(--accent);
+    }
+
+    .result-count {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .band-panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1rem;
+      display: grid;
+      gap: 0.8rem;
+    }
+
+    .band-title {
+      margin: 0;
+      font-size: clamp(1.08rem, 1.2vw + 0.8rem, 1.5rem);
+      line-height: 1.25;
+    }
+
+    .band-subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .section-card {
+      border: 1px solid #e0e8f3;
+      border-radius: 12px;
+      padding: 0.75rem;
+      background: linear-gradient(180deg, #fff, #fbfdff);
+    }
+
+    .section-card h3 {
+      margin: 0 0 0.35rem;
+      font-size: 0.92rem;
+      color: #2b3f5a;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .section-card p {
+      margin: 0;
+      color: #25364d;
+      font-size: 0.95rem;
+    }
+
+    .examples-note {
+      margin: 0;
+      padding: 0.62rem 0.75rem;
+      border-radius: 10px;
+      background: #f4f8ff;
+      border: 1px dashed #b9cae4;
+      color: #3a4d67;
+      font-size: 0.86rem;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid #d9e3f0;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 740px;
+    }
+
+    th,
+    td {
+      border-bottom: 1px solid #e3ebf6;
+      text-align: left;
+      vertical-align: top;
+      padding: 0.66rem 0.62rem;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: #f7faff;
+      color: #314865;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-weight: 700;
+    }
+
+    tbody tr:hover {
+      background: #f9fbff;
+    }
+
+    .item-strong {
+      font-weight: 700;
+      color: #204f97;
+    }
+
+    .type-chip,
+    .usage-chip {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 0.16rem 0.52rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .type-chip.vocab {
+      background: #e7faf7;
+      border-color: #a5f3df;
+      color: var(--vocab);
+    }
+
+    .type-chip.grammar {
+      background: #f3e8ff;
+      border-color: #ddc6ff;
+      color: var(--grammar);
+    }
+
+    .usage-chip {
+      background: var(--accent-soft);
+      border-color: #c9dbff;
+      color: #2d4f8f;
+      font-weight: 600;
+    }
+
+    .empty-state {
+      margin: 0;
+      border: 1px dashed #c6d5e8;
+      border-radius: 12px;
+      background: #f8fbff;
+      padding: 0.9rem;
+      color: #55667d;
+    }
+
+    .mobile-cards {
+      display: none;
+      gap: 0.6rem;
+    }
+
+    .example-card {
+      border: 1px solid #e0e8f3;
+      border-radius: 12px;
+      padding: 0.7rem;
+      background: #fff;
+    }
+
+    .example-card p {
+      margin: 0.3rem 0;
+      font-size: 0.9rem;
+    }
+
+    .example-card .label {
+      color: #5a6c84;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      font-weight: 700;
+    }
+
+    .back-top {
+      position: fixed;
+      right: 0.8rem;
+      bottom: 0.9rem;
+      z-index: 20;
+      border: none;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 0.58rem 0.78rem;
+      box-shadow: 0 10px 20px rgba(37, 99, 235, 0.35);
+      cursor: pointer;
+      transition: 0.2s ease;
+    }
+
+    .back-top:hover {
+      transform: translateY(-2px);
+      filter: brightness(0.96);
+    }
+
+    @media (min-width: 860px) {
+      .layout {
+        grid-template-columns: 260px 1fr;
+        align-items: start;
+      }
+
+      .band-nav {
+        position: sticky;
+        top: 0.9rem;
+        display: grid;
+        gap: 0.5rem;
+        max-height: calc(100vh - 1.8rem);
+        overflow: auto;
+      }
+
+      .band-nav button {
+        text-align: left;
+        border-radius: 10px;
+      }
+
+      .filters {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        align-items: end;
+      }
+
+      .result-count {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      table { display: none; }
+      .mobile-cards { display: grid; }
+      .band-panel { padding: 0.85rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="top">
+    <header class="page-header">
+      <h1>IELTS Vocabulary and Grammar by Band (1-9)</h1>
+      <p>Select your band, then filter by grammar, vocabulary, and exam part. Click on examples and adapt them to your own answers.</p>
+    </header>
+
+    <main class="layout">
+      <nav class="band-nav" id="bandNav" aria-label="Band navigation"></nav>
+
+      <section class="content">
+        <section class="filters" aria-label="Filters">
+          <div class="field">
+            <label for="bandSelect">Band</label>
+            <select id="bandSelect"></select>
+          </div>
+
+          <div class="field">
+            <label for="typeSelect">Type</label>
+            <select id="typeSelect">
+              <option value="all">All</option>
+              <option value="VOCAB">VOCAB</option>
+              <option value="GRAMMAR">GRAMMAR</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="usageSelect">Usage in IELTS</label>
+            <select id="usageSelect">
+              <option value="all">All</option>
+              <option value="writing task 1">Writing Task 1</option>
+              <option value="writing task 2">Writing Task 2</option>
+              <option value="speaking part 1">Speaking Part 1</option>
+              <option value="speaking part 2">Speaking Part 2</option>
+              <option value="speaking part 3">Speaking Part 3</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="searchInput">Search</label>
+            <input id="searchInput" type="search" placeholder="Search item or example sentence..." />
+          </div>
+
+          <p class="result-count" id="resultCount"></p>
+        </section>
+
+        <article class="band-panel" id="bandPanel"></article>
+      </section>
+    </main>
+  </div>
+
+  <button class="back-top" id="backTop" type="button" aria-label="Back to top">Top</button>
+
+  <script>
+    const bandsData = [{"bandLabel":"Band 1–2","bandKey":"1–2","bandName":"Very Limited User","summary":"At Band 1–2, the test taker can only use a few isolated words or very short memorised phrases. Communication breaks down quickly, and answers in Speaking are usually one or two words. Writing often consists of single words or incomplete sentences. There is almost no control of grammar or spelling.[^2]","typicalDescription":"Vocabulary is mostly basic words about family, work, city, food, likes and dislikes, with many mistakes. Grammar is limited to very simple patterns with the verb \"be\" and the simple present, often with missing subjects or verbs. Sentences are usually short and may not be complete. Learners at this level should focus on clear, repeated patterns such as \"I am…\", \"I like…\", and \"I don't like…\".","studyTips":"Practise reading and saying the same short patterns every day (I am…, I like…, I have…). Record simple answers to common Speaking Part 1 questions and repeat until they are automatic. Focus on being clear and understandable, not fast.","examples":[{"type":"GRAMMAR","item":"I am from…","usage":"Use in Speaking Part 1 to answer \"Where are you from?\"","exampleSentence":"I am from Vietnam."},{"type":"GRAMMAR","item":"I am a/an…","usage":"Use in Speaking Part 1 to say your job or role.","exampleSentence":"I am a student."},{"type":"GRAMMAR","item":"I like…","usage":"Use in Speaking Part 1 to talk about things you enjoy.","exampleSentence":"I like football."},{"type":"GRAMMAR","item":"I don’t like…","usage":"Use in Speaking Part 1 to say what you dislike.","exampleSentence":"I don’t like cold weather."},{"type":"VOCAB","item":"family, mother, father","usage":"Use in Speaking Part 1 to answer simple family questions.","exampleSentence":"My family is small. My mother is kind."},{"type":"VOCAB","item":"city, country","usage":"Use in Speaking Part 1 to describe your hometown very simply.","exampleSentence":"My city is big. My country is beautiful."},{"type":"VOCAB","item":"food, rice, meat","usage":"Use in Speaking Part 1 to talk about food you eat.","exampleSentence":"I like rice and meat."},{"type":"VOCAB","item":"work, school","usage":"Use in Speaking Part 1 to say where you go every day.","exampleSentence":"I go to school."}]},{"bandLabel":"Band 3–4","bandKey":"3–4","bandName":"Limited User","summary":"At Band 3–4, the learner can talk about very familiar topics but still has frequent communication breakdowns. Answers are longer than at Band 2 but still simple and repetitive. Writing can produce basic sentences, often with mistakes in tense, spelling, and punctuation. The candidate can usually show overall meaning but not complex ideas.[^3][^2]","typicalDescription":"Vocabulary covers everyday topics such as hobbies, school, daily routine, and simple travel. Learners start using adverbs of frequency like \"usually\", \"sometimes\", and \"never\". Grammar includes the simple present and simple past, \"be going to\" for future, and basic connectors like \"and\", \"but\", and \"because\". Sentences are often short, but candidates can sometimes join two ideas in one sentence.","studyTips":"Collect very short answers to common Speaking Part 1 questions and add one more idea with \"and\" or \"because\". When you write, always try to join two short sentences with a connector like \"and\" or \"but\". Repeat key topic words (study, work, family, hobbies) until you can use them without thinking.","examples":[{"type":"GRAMMAR","item":"I usually / sometimes / never + verb","usage":"Use in Speaking Part 1 to describe habits and routines.","exampleSentence":"I usually get up at 7 o’clock and I sometimes go jogging."},{"type":"GRAMMAR","item":"Simple past (I went / I saw / I visited)","usage":"Use in Speaking Part 2 to describe a past experience.","exampleSentence":"Last year I visited my uncle in London."},{"type":"GRAMMAR","item":"be going to + verb","usage":"Use in Speaking Part 1 or 2 to talk about future plans.","exampleSentence":"Next weekend I am going to see a movie with my friends."},{"type":"GRAMMAR","item":"… and … / … but …","usage":"Use in Speaking Part 1 to connect two simple ideas.","exampleSentence":"I like watching films, but I don’t like watching sports."},{"type":"GRAMMAR","item":"because + clause","usage":"Use in Speaking Part 1 to give a simple reason.","exampleSentence":"I like English because it is useful for my job."},{"type":"VOCAB","item":"hobby, enjoy, free time","usage":"Use in Speaking Part 1 when asked about hobbies.","exampleSentence":"My main hobby is reading, and I enjoy books in my free time."},{"type":"VOCAB","item":"usually, sometimes, never","usage":"Use in Speaking Part 1 to make answers more detailed.","exampleSentence":"I usually cook at home, but sometimes I eat in a restaurant."},{"type":"VOCAB","item":"travel, ticket, station","usage":"Use in very simple Writing Task 1 sentences about journeys.","exampleSentence":"I bought a ticket at the station yesterday."},{"type":"VOCAB","item":"study, subject, exam","usage":"Use in Speaking Part 1 and simple Task 2 sentences about education.","exampleSentence":"My favourite subject is maths and I study hard for the exam."},{"type":"VOCAB","item":"breakfast, lunch, dinner","usage":"Use in Speaking Part 1 to talk about daily routine.","exampleSentence":"I have a small breakfast and a big dinner with my family."}]},{"bandLabel":"Band 5","bandKey":"5","bandName":"Modest User","summary":"At Band 5, the learner has a partial but functional command of English and can handle basic communication in familiar situations. There are many mistakes, but the overall message is usually clear. Speaking answers are longer and can include simple explanations and comparisons. Writing can produce simple and some compound or complex sentences with basic organisation.[^1][^3]","typicalDescription":"Vocabulary at Band 5 covers common IELTS topics such as education, environment, health, and technology. Learners start to use simple collocations like \"make friends\", \"get a job\", and \"have problems\". Grammar includes simple and compound sentences, with some attempts at complex sentences using \"because\", \"although\", and \"if\". Accuracy is not always high, but there is some variety in structures.","studyTips":"Collect common collocations for big IELTS topics and make your own sentences. When you write, always add a reason or result using \"because\", \"so\", or \"although\". In Speaking, try to give one example after your main idea to sound more developed.","examples":[{"type":"VOCAB","item":"make friends","usage":"Use in Speaking Part 1 or 2 to talk about social life.","exampleSentence":"It is easy to make friends at university because many students have similar interests."},{"type":"VOCAB","item":"get a job","usage":"Use in Writing Task 2 when discussing education or careers.","exampleSentence":"Many young people go to university so they can get a good job in the future."},{"type":"VOCAB","item":"have problems with…","usage":"Use in Writing Task 2 to introduce difficulties.","exampleSentence":"Some students have problems with managing their time, so they feel very stressed."},{"type":"VOCAB","item":"healthy lifestyle","usage":"Use in Writing Task 2 about health or food.","exampleSentence":"Governments should encourage people to have a healthy lifestyle by providing sports facilities."},{"type":"VOCAB","item":"protect the environment","usage":"Use in Writing Task 2 on environmental topics.","exampleSentence":"Individuals can help protect the environment by recycling and using public transport."},{"type":"VOCAB","item":"modern technology","usage":"Use in Speaking Part 3 or Writing Task 2.","exampleSentence":"Modern technology makes communication easier, but it can also reduce face‑to‑face interaction."},{"type":"GRAMMAR","item":"Because + clause, main clause","usage":"Use in Writing Task 2 to explain reasons.","exampleSentence":"Because public transport is cheap, many people prefer to use it instead of driving."},{"type":"GRAMMAR","item":"Although + clause, main clause","usage":"Use in Writing Task 2 to show contrast.","exampleSentence":"Although fast food is convenient, it is not very healthy for people."},{"type":"GRAMMAR","item":"If + present, will + verb (first conditional)","usage":"Use in Speaking Part 3 to talk about possible futures.","exampleSentence":"If people do more exercise, they will become healthier."},{"type":"GRAMMAR","item":"Simple time markers (nowadays, in the past, in the future)","usage":"Use in Writing Task 2 to compare time periods.","exampleSentence":"In the past, people wrote letters, but nowadays they usually send emails."},{"type":"GRAMMAR","item":"and / but / so to link clauses","usage":"Use in Writing Task 1 and 2 for longer sentences.","exampleSentence":"The number of cars increased, so the air pollution became worse."},{"type":"VOCAB","item":"take exercise / do exercise","usage":"Use in Speaking Part 1 and 2 when talking about health.","exampleSentence":"I try to do exercise three times a week to stay fit."},{"type":"VOCAB","item":"cause traffic jams","usage":"Use in Writing Task 2 about cities and transport.","exampleSentence":"More private cars cause traffic jams in many big cities."},{"type":"VOCAB","item":"have access to…","usage":"Use in Writing Task 2 when talking about opportunities.","exampleSentence":"Today, many children have access to the Internet at school and at home."}]},{"bandLabel":"Band 6","bandKey":"6","bandName":"Competent User","summary":"At Band 6, the learner has an effective command of English despite some inaccuracies and misunderstandings. They can use and understand reasonably complex language, especially in familiar academic or everyday topics. Speaking answers are generally fluent, with some hesitation when searching for words. Writing can produce clear paragraphs with topic sentences and supporting details.[^4][^1]","typicalDescription":"Vocabulary at Band 6 includes a wider range of topic‑related and basic academic words such as \"cause\", \"effect\", \"impact\", and \"advantage\". Learners use more precise collocations like \"take measures to\", \"have a negative impact on\", and \"play an important role\". Grammar shows a mix of simple and complex sentences, including relative clauses (who/which/that) and basic conditionals (first and second). Errors still occur, but they do not usually stop communication.","studyTips":"Practise writing clear topic sentences followed by two supporting points or examples. Learn collocations for cause, effect, and solution, then use them to build full paragraphs. In Speaking Part 3, try to answer the question, give a reason, and add an example using relative clauses or conditionals.","examples":[{"type":"VOCAB","item":"cause / lead to","usage":"Use in Writing Task 2 to explain reasons and results.","exampleSentence":"Increasing levels of pollution can cause serious health problems in urban areas."},{"type":"VOCAB","item":"effect / impact","usage":"Use in Writing Task 2 to discuss results.","exampleSentence":"The rise in fuel prices has a direct impact on the cost of public transport."},{"type":"VOCAB","item":"advantage / disadvantage","usage":"Use in Writing Task 2 to structure argument essays.","exampleSentence":"One major advantage of online learning is that students can study at their own pace."},{"type":"VOCAB","item":"take measures to + verb","usage":"Use in Writing Task 2 to suggest solutions.","exampleSentence":"Governments should take measures to reduce waste by improving recycling systems."},{"type":"VOCAB","item":"have a negative impact on","usage":"Use in Writing Task 2 and Speaking Part 3.","exampleSentence":"Excessive screen time can have a negative impact on children’s social skills."},{"type":"VOCAB","item":"play an important role in","usage":"Use in Writing Task 2 introductions and body paragraphs.","exampleSentence":"Education plays an important role in improving people’s quality of life."},{"type":"GRAMMAR","item":"Relative clause with who","usage":"Use in Writing Task 2 to add extra information about people.","exampleSentence":"People who live in big cities often suffer from high levels of stress."},{"type":"GRAMMAR","item":"Relative clause with which/that","usage":"Use in Writing Task 2 for things or ideas.","exampleSentence":"Public transport, which is usually cheaper than driving, can reduce traffic congestion."},{"type":"GRAMMAR","item":"First conditional (If + present, will + verb)","usage":"Use in Speaking Part 3 to talk about likely results.","exampleSentence":"If governments invest more in public transport, more people will use it."},{"type":"GRAMMAR","item":"Second conditional (If + past, would + verb)","usage":"Use in Speaking Part 3 to talk about unreal or hypothetical situations.","exampleSentence":"If I had more free time, I would learn another foreign language."},{"type":"GRAMMAR","item":"\"There is/are\" for describing graphs","usage":"Use in Writing Task 1 overviews.","exampleSentence":"There was a significant increase in the number of tourists between 2010 and 2020."},{"type":"GRAMMAR","item":"Topic sentence pattern: One main advantage is that…","usage":"Use in Writing Task 2 body paragraphs.","exampleSentence":"One main advantage of working from home is that employees can save time on commuting."},{"type":"VOCAB","item":"increase / decrease significantly","usage":"Use in Writing Task 1 to describe trends.","exampleSentence":"The number of car owners increased significantly over the 10‑year period."},{"type":"VOCAB","item":"in comparison / in contrast","usage":"Use in Writing Task 1 and 2 to compare ideas.","exampleSentence":"In contrast, rural areas experienced only a slight growth in population."}]},{"bandLabel":"Band 7","bandKey":"7","bandName":"Good User","summary":"At Band 7, the learner has operational command of English and generally handles complex language well. There are occasional inaccuracies, but overall control of grammar and vocabulary is strong. Speaking answers are extended, well organised, and show a range of expressions and structures. Writing includes clear argumentation with appropriate paragraphing and some flexibility in style.[^3][^1]","typicalDescription":"Vocabulary at Band 7 includes less common lexical items and more formal expressions such as \"pose a threat\", \"play a vital role\", and \"from my perspective\". Learners can choose words with reasonable precision and show some awareness of collocation and register. Grammar shows a variety of complex structures, including concession clauses, inversion for emphasis, and more advanced conditional forms. Errors are present but do not reduce clarity.","studyTips":"Build a personal list of less common but high‑value phrases for introductions, topic sentences, and conclusions. Practise rewriting simple ideas in more formal language using nominalisation and complex clauses. In Speaking Part 3, aim to develop each answer with an opinion, a reason, an example, and sometimes a short comparison or concession.","examples":[{"type":"VOCAB","item":"pose a threat to…","usage":"Use in Writing Task 2 to describe serious problems.","exampleSentence":"Climate change poses a serious threat to low‑lying coastal regions."},{"type":"VOCAB","item":"play a vital role in…","usage":"Use in Writing Task 2 introductions and Speaking Part 3.","exampleSentence":"Public transport plays a vital role in reducing congestion in major cities."},{"type":"VOCAB","item":"from my perspective / from my point of view","usage":"Use in Speaking Part 3 to give opinions politely.","exampleSentence":"From my perspective, investing in education is the most effective way to reduce crime."},{"type":"VOCAB","item":"a growing number of…","usage":"Use in Writing Task 2 to introduce trends.","exampleSentence":"A growing number of people are choosing to work remotely rather than in a traditional office."},{"type":"VOCAB","item":"it is widely believed that…","usage":"Use in Writing Task 2 introductions to present a common view.","exampleSentence":"It is widely believed that universities should focus more on practical skills than theoretical knowledge."},{"type":"VOCAB","item":"raise public awareness","usage":"Use in Writing Task 2 to suggest solutions.","exampleSentence":"Governments can raise public awareness about environmental issues through campaigns and education."},{"type":"GRAMMAR","item":"Although + clause, main clause","usage":"Use in Writing Task 2 to introduce a balanced argument.","exampleSentence":"Although online courses offer great flexibility, they may not be suitable for all learners."},{"type":"GRAMMAR","item":"While + clause, main clause","usage":"Use in Writing Task 2 introductions to show contrast.","exampleSentence":"While some people argue that cars should be banned from city centres, others believe they are still necessary."},{"type":"GRAMMAR","item":"Inversion for emphasis: Not only … but (also)…","usage":"Use in Writing Task 2 to emphasise two connected points.","exampleSentence":"Not only does regular exercise improve physical health, but it also benefits mental well‑being."},{"type":"GRAMMAR","item":"Mixed conditionals (If + past perfect, would + verb now)","usage":"Use in Speaking Part 3 to show complex thinking.","exampleSentence":"If governments had invested more in renewable energy in the past, we would face fewer environmental problems today."},{"type":"GRAMMAR","item":"It is essential/important/necessary that + clause","usage":"Use in Writing Task 2 to make strong recommendations.","exampleSentence":"It is essential that schools teach students how to manage their finances."},{"type":"GRAMMAR","item":"Nominalisation: the increase in / the reduction of","usage":"Use in Writing Task 2 to sound more academic.","exampleSentence":"The increase in car ownership has led to more pollution in urban areas."},{"type":"VOCAB","item":"address a problem / tackle an issue","usage":"Use in Writing Task 2 when suggesting actions.","exampleSentence":"Governments should do more to address the problem of unemployment among young people."},{"type":"VOCAB","item":"rely heavily on…","usage":"Use in Speaking Part 3 to show nuanced opinion.","exampleSentence":"Many people now rely heavily on their smartphones for communication and information."}]},{"bandLabel":"Band 8","bandKey":"8","bandName":"Very Good User","summary":"At Band 8, the learner has a fully operational command of English with only occasional unsystematic inaccuracies. They handle complex and detailed argumentation very well. Speaking is natural, flexible, and usually fluent, with only rare hesitation for language. Writing shows strong control of academic style, with precise vocabulary and a wide range of complex grammar used accurately.[^2][^1]","typicalDescription":"Vocabulary at Band 8 is high‑level and topic‑specific, including items like \"mitigate\", \"detrimental\", and \"pervasive\". Learners can choose words that are both accurate and natural for the context, avoiding over‑use of memorised phrases. Grammar includes participle clauses, reduced relative clauses, and cleft sentences such as \"What is particularly important is…\", used to organise information and emphasise key points. Sentences are complex but usually clear and concise.","studyTips":"Focus on precision and naturalness rather than showing every advanced structure you know. Practise turning long sentences into clearer ones using participle and reduced relative clauses. In Speaking Part 3, use high‑level vocabulary only when it feels natural, and balance complex sentences with some shorter, direct ones.","examples":[{"type":"VOCAB","item":"mitigate (the effects/impact of)","usage":"Use in Writing Task 2 when discussing solutions.","exampleSentence":"Governments can introduce stricter emission standards to mitigate the effects of air pollution."},{"type":"VOCAB","item":"detrimental (to)","usage":"Use in Writing Task 2 and Speaking Part 3 to describe negative consequences.","exampleSentence":"Spending too much time on social media can be detrimental to young people’s mental health."},{"type":"VOCAB","item":"pervasive","usage":"Use in Writing Task 2 to describe something that is widespread.","exampleSentence":"In many countries, advertising has become a pervasive influence on children’s behaviour."},{"type":"VOCAB","item":"a considerable / substantial increase in…","usage":"Use in Writing Task 1 to describe strong upward trends.","exampleSentence":"The chart shows a substantial increase in the number of people using public transport between 2000 and 2020."},{"type":"VOCAB","item":"allocate resources","usage":"Use in Writing Task 2 when discussing government spending.","exampleSentence":"Governments must decide how to allocate resources effectively between healthcare and education."},{"type":"VOCAB","item":"social cohesion","usage":"Use in Writing Task 2 on social topics.","exampleSentence":"High levels of inequality can seriously damage social cohesion within a society."},{"type":"GRAMMAR","item":"Participle clause (Starting a sentence with -ing form)","usage":"Use in Writing Task 2 to show cause or result concisely.","exampleSentence":"Facing increasing congestion in city centres, many commuters are turning to bicycles and public transport."},{"type":"GRAMMAR","item":"Reduced relative clause (students living in cities)","usage":"Use in Writing Task 2 to make writing more concise.","exampleSentence":"Students living in urban areas generally have greater access to cultural activities."},{"type":"GRAMMAR","item":"Cleft sentence: What is particularly important is…","usage":"Use in Writing Task 2 conclusions to emphasise main point.","exampleSentence":"What is particularly important is that governments and individuals work together to address climate change."},{"type":"GRAMMAR","item":"Cleft sentence: It is … that …","usage":"Use in Writing Task 2 introductions to highlight key ideas.","exampleSentence":"It is modern technology that has transformed the way we communicate."},{"type":"GRAMMAR","item":"\"Having + past participle\" clause","usage":"Use in Writing Task 2 to sequence actions.","exampleSentence":"Having completed their university studies, many young people struggle to find suitable employment."},{"type":"VOCAB","item":"exacerbate a problem","usage":"Use in Writing Task 2 when discussing negative developments.","exampleSentence":"Poor urban planning can exacerbate the problem of traffic congestion."},{"type":"VOCAB","item":"foster innovation / creativity","usage":"Use in Speaking Part 3 and Writing Task 2.","exampleSentence":"Competitive markets can foster innovation by encouraging companies to develop new products."},{"type":"VOCAB","item":"stringent regulations","usage":"Use in Writing Task 2 about law and policy.","exampleSentence":"Stringent regulations on waste disposal are necessary to protect the environment."}]},{"bandLabel":"Band 9","bandKey":"9","bandName":"Expert User","summary":"At Band 9, the learner has fully operational command of English. Use of the language is appropriate, accurate, and fluent, and shows complete understanding, even in unfamiliar or abstract situations. Speaking is effortless, with sophisticated control of style and register. Writing is cohesive, concise, and highly flexible, with complex grammar and advanced lexis used naturally and precisely.[^1][^3]","typicalDescription":"Vocabulary at Band 9 is extremely flexible and often idiomatic, yet always appropriate to the task and audience. Candidates can draw on academic phrases such as \"a burgeoning body of research\" and \"far‑reaching consequences\" without sounding memorised. Grammar is highly controlled: complex sentences remain clear, with accurate use of advanced patterns, but the writer or speaker also knows when a simple sentence is more effective. The focus is on clarity, coherence, and nuance rather than showing off.","studyTips":"At this level, focus on refining argument structure, tone, and concision rather than learning more rare words. Practise editing your Writing Task 2 essays to remove unnecessary complexity while keeping nuance. In Speaking, vary your style naturally depending on the question, shifting smoothly between informal and more academic language when appropriate.","examples":[{"type":"VOCAB","item":"a burgeoning body of research","usage":"Use in Writing Task 2 to refer to academic evidence.","exampleSentence":"A burgeoning body of research suggests that early childhood education has long‑term benefits for both individuals and society."},{"type":"VOCAB","item":"far‑reaching consequences","usage":"Use in Writing Task 2 conclusions to highlight the importance of an issue.","exampleSentence":"If current consumption patterns continue, the environmental damage could have far‑reaching consequences for future generations."},{"type":"VOCAB","item":"at the other end of the spectrum","usage":"Use in Writing Task 2 and Speaking Part 3 to introduce contrast elegantly.","exampleSentence":"At the other end of the spectrum, some people argue that individual lifestyle changes are more effective than government policies."},{"type":"VOCAB","item":"strike a balance between… and…","usage":"Use in Writing Task 2 to present a balanced view.","exampleSentence":"Policymakers must strike a balance between promoting economic growth and protecting the environment."},{"type":"VOCAB","item":"be driven primarily by…","usage":"Use in Writing Task 2 to analyse causes.","exampleSentence":"Recent changes in the job market appear to be driven primarily by advances in automation."},{"type":"VOCAB","item":"a nuanced understanding of…","usage":"Use in Speaking Part 3 and Writing Task 2 to show sophistication.","exampleSentence":"To design effective policies, governments need a nuanced understanding of how social media influences public opinion."},{"type":"GRAMMAR","item":"Complex, yet clear, relative and participle combinations","usage":"Use in Writing Task 2 body paragraphs for dense but readable information.","exampleSentence":"Many small businesses, which are often described as the backbone of the economy, are struggling to adapt to rapidly changing consumer behaviour."},{"type":"GRAMMAR","item":"Balanced complex sentence with concession and result","usage":"Use in Writing Task 2 to show mature argumentation.","exampleSentence":"Although international tourism can place pressure on local resources, it often provides essential income that enables communities to preserve their cultural heritage."},{"type":"GRAMMAR","item":"Flexible conditional structures for hypothesis and evaluation","usage":"Use in Speaking Part 3 to explore hypothetical scenarios.","exampleSentence":"If governments were to invest more heavily in public transport, not only would congestion be reduced, but citizens would also enjoy cleaner air and shorter commutes."},{"type":"GRAMMAR","item":"Precise reference with this/that/which to link ideas","usage":"Use in Writing Task 2 to maintain cohesion without repetition.","exampleSentence":"Many people now work remotely; this has transformed the way companies think about office space."},{"type":"GRAMMAR","item":"Strategic short sentence for emphasis","usage":"Use in Writing Task 2 conclusions for impact.","exampleSentence":"The stakes could not be higher."},{"type":"VOCAB","item":"empirical evidence / longitudinal studies","usage":"Use in Writing Task 2 to support arguments with academic tone.","exampleSentence":"Policy decisions should be based on empirical evidence, including longitudinal studies that track outcomes over time."},{"type":"VOCAB","item":"be widely regarded as…","usage":"Use in Speaking Part 3 or Writing Task 2 to introduce shared views.","exampleSentence":"Renewable energy is widely regarded as a key component of any sustainable development strategy."}]}];
+
+    const state = {
+      selectedBand: bandsData[0].bandLabel,
+      type: 'all',
+      usage: 'all',
+      search: '',
+    };
+
+    const bandNav = document.getElementById('bandNav');
+    const bandSelect = document.getElementById('bandSelect');
+    const typeSelect = document.getElementById('typeSelect');
+    const usageSelect = document.getElementById('usageSelect');
+    const searchInput = document.getElementById('searchInput');
+    const bandPanel = document.getElementById('bandPanel');
+    const resultCount = document.getElementById('resultCount');
+    const backTop = document.getElementById('backTop');
+
+    const stripRefs = (text) => text.replace(/[^d+]/g, '').trim();
+
+    function usageShort(rawUsage) {
+      const lower = rawUsage.toLowerCase();
+      if (lower.includes('writing task 1')) return 'Writing Task 1';
+      if (lower.includes('writing task 2')) return 'Writing Task 2';
+      if (lower.includes('speaking part 1')) return 'Speaking Part 1';
+      if (lower.includes('speaking part 2')) return 'Speaking Part 2';
+      if (lower.includes('speaking part 3')) return 'Speaking Part 3';
+      return 'General IELTS';
+    }
+
+    function createUsageChip(usageText) {
+      return '<span class="usage-chip">' + usageShort(usageText) + '</span>';
+    }
+
+    function renderNav() {
+      bandNav.innerHTML = bandsData
+        .map(
+          (band) =>
+            '<button type="button" data-band="' + band.bandLabel + '" class="' +
+            (band.bandLabel === state.selectedBand ? 'active' : '') +
+            '">' + band.bandLabel + '</button>'
+        )
+        .join('');
+    }
+
+    function renderBandSelect() {
+      bandSelect.innerHTML = bandsData
+        .map((band) =>
+          '<option value="' + band.bandLabel + '" ' +
+            (band.bandLabel === state.selectedBand ? 'selected' : '') +
+            '>' + band.bandLabel + '</option>'
+        )
+        .join('');
+    }
+
+    function filteredExamples(band) {
+      const q = state.search.trim().toLowerCase();
+      return band.examples.filter((example) => {
+        if (state.type !== 'all' && example.type !== state.type) return false;
+        if (state.usage !== 'all' && !example.usage.toLowerCase().includes(state.usage)) return false;
+        if (q) {
+          const hay = (example.item + ' ' + example.exampleSentence).toLowerCase();
+          if (!hay.includes(q)) return false;
+        }
+        return true;
+      });
+    }
+
+    function renderBand() {
+      const band = bandsData.find((b) => b.bandLabel === state.selectedBand) || bandsData[0];
+      const examples = filteredExamples(band);
+
+      resultCount.textContent = examples.length + ' example(s) shown for ' + band.bandLabel + '.';
+
+      const tableRows = examples
+        .map((row) => {
+          const typeClass = row.type.toLowerCase();
+          return (
+            '<tr>' +
+              '<td><span class="type-chip ' + typeClass + '">' + row.type + '</span></td>' +
+              '<td class="item-strong">' + row.item + '</td>' +
+              '<td>' + createUsageChip(row.usage) + '</td>' +
+              '<td>' + row.exampleSentence + '</td>' +
+            '</tr>'
+          );
+        })
+        .join('');
+
+      const mobileCards = examples
+        .map((row) => {
+          const typeClass = row.type.toLowerCase();
+          return (
+            '<article class="example-card">' +
+              '<p><span class="label">Type</span><br><span class="type-chip ' + typeClass + '">' + row.type + '</span></p>' +
+              '<p><span class="label">Item</span><br><span class="item-strong">' + row.item + '</span></p>' +
+              '<p><span class="label">Usage in IELTS</span><br>' + createUsageChip(row.usage) + '</p>' +
+              '<p><span class="label">Example Sentence</span><br>' + row.exampleSentence + '</p>' +
+            '</article>'
+          );
+        })
+        .join('');
+
+      bandPanel.innerHTML =
+        '<h2 class="band-title">' + band.bandLabel + ': ' + band.bandName + '</h2>' +
+        '<p class="band-subtitle">One-band-up practice is recommended for steady score growth.</p>' +
+        '<section class="section-card"><h3>Summary</h3><p>' + stripRefs(band.summary) + '</p></section>' +
+        '<section class="section-card"><h3>Typical Vocabulary and Grammar</h3><p>' + stripRefs(band.typicalDescription) + '</p></section>' +
+        (band.studyTips
+          ? '<section class="section-card"><h3>Study Tips</h3><p>' + stripRefs(band.studyTips) + '</p></section>'
+          : '') +
+        '<p class="examples-note">These examples are realistic for this band. Use them as models, not scripts to memorise.</p>' +
+        (examples.length
+          ? '<div class="table-wrap"><table><thead><tr><th>Type</th><th>Item</th><th>Usage in IELTS</th><th>Example Sentence</th></tr></thead><tbody>' +
+            tableRows +
+            '</tbody></table></div><div class="mobile-cards">' + mobileCards + '</div>'
+          : '<p class="empty-state">No examples match the current filters. Try \"All\" type/usage or clear your search.</p>');
+    }
+
+    function rerender() {
+      renderNav();
+      renderBandSelect();
+      renderBand();
+    }
+
+    bandNav.addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-band]');
+      if (!btn) return;
+      state.selectedBand = btn.dataset.band;
+      rerender();
+    });
+
+    bandSelect.addEventListener('change', (e) => {
+      state.selectedBand = e.target.value;
+      rerender();
+    });
+
+    typeSelect.addEventListener('change', (e) => {
+      state.type = e.target.value;
+      renderBand();
+      renderNav();
+    });
+
+    usageSelect.addEventListener('change', (e) => {
+      state.usage = e.target.value;
+      renderBand();
+      renderNav();
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      state.search = e.target.value;
+      renderBand();
+    });
+
+    backTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    rerender();
+  </script>
+</body>
+</html>
