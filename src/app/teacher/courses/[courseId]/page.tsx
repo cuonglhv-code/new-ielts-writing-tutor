@@ -1,16 +1,16 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
-import { createModule } from './actions'
+import { createModule } from '../actions'
 import { Course, Module } from '@/lib/types'
 
 type PageProps = {
-  params: { id: string }
+  params: { courseId: string }
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {
   const supabase = createClient()
-  const { id: courseId } = params
+  const { courseId } = params
 
   const {
     data: { user },
@@ -132,3 +132,4 @@ export default async function CourseDetailPage({ params }: PageProps) {
       </main>
     </>
   )
+}

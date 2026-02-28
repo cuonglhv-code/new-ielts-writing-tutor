@@ -35,3 +35,23 @@ export async function createCourse(formData: FormData) {
   revalidatePath('/teacher/courses')
   redirect('/teacher/courses')
 }
+
+export async function createModule(formData: FormData) {
+  const supabase = createClient()
+  const courseId = formData.get('course_id') as string
+  
+  const { error } = await supabase.from('modules').insert([
+    {
+      course_id: courseId,
+      title: formData.get('title') as string,
+      description: formData.get('description') as string,
+    },
+  ])
+
+  if (error) {
+    console.error('Error creating module:', error)
+    throw new Error('Failed to create module.')
+  }
+
+  revalidatePath(`/teacher/courses/${courseId}`)
+}

@@ -4,6 +4,8 @@ import Navbar from '@/components/layout/Navbar'
 import { Lesson, Question } from '@/lib/types'
 import Link from 'next/link'
 
+import { addQuestionToLesson, removeQuestionFromLesson } from './actions'
+
 type PageProps = {
   params: { courseId: string; moduleId: string; lessonId: string }
 }
@@ -43,11 +45,7 @@ export default async function LessonDetailPage({ params }: PageProps) {
         </>
     )
   }
-
-import { addQuestionToLesson, removeQuestionFromLesson } from './actions'
-
-// ... imports and component definition
-
+  
   const { data: lessonQuestions } = await supabase
     .from('lesson_questions')
     .select('*, questions(*)')
@@ -115,7 +113,7 @@ import { addQuestionToLesson, removeQuestionFromLesson } from './actions'
                                <form action={addQuestionToLesson}>
                                    <input type="hidden" name="lesson_id" value={lessonId} />
                                    <input type="hidden" name="question_id" value={q.id} />
-                                   <button type="submit" className="text-sm text-blue-600 hover:text-blue-800">Add</button>
+                                   <button type="submit" className="text-sm text-blue-.600 hover:text-blue-800">Add</button>
                                </form>
                             </li>
                         ))}

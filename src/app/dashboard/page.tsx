@@ -64,8 +64,6 @@ export default async function DashboardPage() {
     }
   })
 
-  const allSubs: Submission[] = (submissions ?? []) as Submission[]
-
   const totalSubs = allSubs.length
   const avgBand =
     totalSubs > 0

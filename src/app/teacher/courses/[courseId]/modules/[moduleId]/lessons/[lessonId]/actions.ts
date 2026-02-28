@@ -24,8 +24,10 @@ export async function addQuestionToLesson(formData: FormData) {
 
   // Need to get the path segments to revalidate
   const { data: lesson } = await supabase.from('lessons').select('modules(course_id, id)').eq('id', lesson_id).single()
-  const courseId = lesson?.modules?.course_id
-  const moduleId = lesson?.modules?.id
+  // @ts-ignore
+  const courseId = lesson?.modules.course_id
+  // @ts-ignore
+  const moduleId = lesson?.modules.id
   
   if(courseId && moduleId){
     revalidatePath(`/teacher/courses/${courseId}/modules/${moduleId}/lessons/${lesson_id}`)
@@ -54,8 +56,10 @@ export async function removeQuestionFromLesson(formData: FormData) {
 
     // Need to get the path segments to revalidate
     const { data: lesson } = await supabase.from('lessons').select('modules(course_id, id)').eq('id', lesson_id).single()
-    const courseId = lesson?.modules?.course_id
-    const moduleId = lesson?.modules?.id
+    // @ts-ignore
+    const courseId = lesson?.modules.course_id
+    // @ts-ignore
+    const moduleId = lesson?.modules.id
     
     if(courseId && moduleId){
       revalidatePath(`/teacher/courses/${courseId}/modules/${moduleId}/lessons/${lesson_id}`)

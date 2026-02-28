@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
-import { createCourse } from './actions'
+import { createCourse } from '../actions'
 
 export default async function NewCoursePage() {
   const supabase = createClient()

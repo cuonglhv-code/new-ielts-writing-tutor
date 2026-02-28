@@ -5,12 +5,12 @@ import Navbar from '@/components/layout/Navbar'
 import { Course, Module, Lesson, LessonCompletion } from '@/lib/types'
 
 type PageProps = {
-  params: { id: string }
+  params: { courseId: string }
 }
 
 export default async function CourseDetailPage({ params }: PageProps) {
   const supabase = createClient()
-  const { id: courseId } = params
+  const { courseId } = params
 
   const {
     data: { user },
