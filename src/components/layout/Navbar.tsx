@@ -14,12 +14,14 @@ const studentLinks = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/practice', label: 'Practice' },
   { href: '/tips', label: 'IELTS Tips' },
+  { href: '/vocab-grammar', label: 'Vocab & Grammar' },
   { href: '/writing-samples', label: 'Writing Samples' },
 ]
 
 const teacherLinks = [
   { href: '/teacher', label: 'Students' },
   { href: '/tips', label: 'IELTS Tips' },
+  { href: '/vocab-grammar', label: 'Vocab & Grammar' },
   { href: '/writing-samples', label: 'Writing Samples' },
 ]
 
