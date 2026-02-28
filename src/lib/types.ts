@@ -131,3 +131,45 @@ export interface Tip {
   topic_tag?: string | null
   created_at: string
 }
+
+export interface Course {
+  id: string
+  title: string
+  description: string | null
+  created_at: string
+}
+
+export interface Module {
+  id: string
+  course_id: string
+  title: string
+  description: string | null
+  module_order: number
+  created_at: string
+}
+
+export interface Lesson {
+  id: string
+  module_id: string
+  title: string
+  lesson_type: 'video' | 'reading' | 'quiz' | 'listening' | 'speaking'
+  content: string | null
+  lesson_order: number
+  created_at: string
+}
+
+export interface LessonCompletion {
+  user_id: string;
+  lesson_id: string;
+  completed_at: string;
+}
+
+export interface ModuleQuestion {
+  module_id: string
+  question_id: string
+}
+
+export interface LessonQuestion {
+  lesson_id: string;
+  question_id: string;
+}

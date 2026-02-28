@@ -5,7 +5,8 @@ import { formatDate } from '@/lib/utils'
 import BandBadge from '@/components/ui/BandBadge'
 import Navbar from '@/components/layout/Navbar'
 import StudentChart from './StudentChart'
-import { Submission } from '@/lib/types'
+import { Submission, Course, Lesson, LessonCompletion, Module } from '@/lib/types'
+import CourseProgress from './CourseProgress'
 
 export default async function DashboardPage() {
   const supabase = createClient()
@@ -31,6 +32,37 @@ export default async function DashboardPage() {
     .eq('student_id', user.id)
     .order('submitted_at', { ascending: false })
     .limit(50)
+
+  const { data: coursesData } = await supabase.from('courses').select('*')
+  const { data: lessonCompletionsData } = await supabase
+    .from('lesson_completions')
+    .select('lesson_id')
+    .eq('user_id', user.id)
+  const { data: lessonsData } = await supabase.from('lessons').select('id, module_id')
+  const { data: modulesData } = await supabase.from('modules').select('id, course_id')
+
+  const allSubs: Submission[] = (submissions ?? []) as Submission[]
+  
+  const courses: Course[] = (coursesData ?? []) as Course[]
+  const lessonCompletions: LessonCompletion[] = (lessonCompletionsData ?? []) as LessonCompletion[]
+  const lessons: Lesson[] = (lessonsData ?? []) as any[]
+  const modules: Module[] = (modulesData ?? []) as Module[]
+
+  const completedLessonIds = new Set(lessonCompletions.map(lc => lc.lesson_id))
+
+  const courseProgress = courses.map(course => {
+    const courseModules = modules.filter(m => m.course_id === course.id)
+    const courseModuleIds = courseModules.map(m => m.id)
+    const courseLessons = lessons.filter(l => courseModuleIds.includes(l.module_id))
+    const completedLessonsInCourse = courseLessons.filter(l => completedLessonIds.has(l.id))
+    const progress = courseLessons.length > 0 ? (completedLessonsInCourse.length / courseLessons.length) * 100 : 0
+    return {
+      ...course,
+      progress,
+      totalLessons: courseLessons.length,
+      completedLessons: completedLessonsInCourse.length
+    }
+  })
 
   const allSubs: Submission[] = (submissions ?? []) as Submission[]
 
@@ -101,6 +133,10 @@ export default async function DashboardPage() {
             sub={streak === 1 ? 'day in a row' : 'days in a row'}
             colour="indigo"
           />
+        </div>
+
+        <div className="my-8">
+          <CourseProgress courses={courseProgress} />
         </div>
 
         {/* Chart + recent submissions */}

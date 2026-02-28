@@ -12,6 +12,7 @@ interface NavbarProps {
 
 const studentLinks = [
   { href: '/dashboard', label: 'Dashboard' },
+  { href: '/courses', label: 'Courses' },
   { href: '/practice', label: 'Practice' },
   { href: '/tips', label: 'IELTS Tips' },
   { href: '/vocab-grammar', label: 'Vocab & Grammar' },
@@ -20,6 +21,8 @@ const studentLinks = [
 
 const teacherLinks = [
   { href: '/teacher', label: 'Students' },
+  { href: '/teacher/submissions', label: 'Submissions' },
+  { href: '/teacher/courses', label: 'Courses' },
   { href: '/tips', label: 'IELTS Tips' },
   { href: '/vocab-grammar', label: 'Vocab & Grammar' },
   { href: '/writing-samples', label: 'Writing Samples' },
