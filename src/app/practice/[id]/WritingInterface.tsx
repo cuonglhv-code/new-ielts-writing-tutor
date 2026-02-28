@@ -33,18 +33,18 @@ function formatTime(seconds: number) {
 export default function WritingInterface({ question }: { question: Question }) {
   const router = useRouter()
   const totalTime = TASK_TIMES[question.task_type] ?? 60 * 60
-  const minWords  = MIN_WORDS[question.task_type]  ?? 150
+  const minWords = MIN_WORDS[question.task_type] ?? 150
 
-  const [essay, setEssay]               = useState('')
-  const [timeLeft, setTimeLeft]         = useState(totalTime)
-  const [timerActive, setTimerActive]   = useState(true)
+  const [essay, setEssay] = useState('')
+  const [timeLeft, setTimeLeft] = useState(totalTime)
+  const [timerActive, setTimerActive] = useState(true)
   const [timerDismissed, setTimerDismissed] = useState(false)
-  const [submitting, setSubmitting]     = useState(false)
-  const [error, setError]               = useState('')
-  const [showImage, setShowImage]       = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [showImage, setShowImage] = useState(true)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const wordCount   = countWords(essay)
+  const wordCount = countWords(essay)
   const meetsMinimum = wordCount >= minWords
 
   const tick = useCallback(() => {
@@ -94,7 +94,7 @@ export default function WritingInterface({ question }: { question: Question }) {
     timeLeft > 300 ? 'text-gray-700' : timeLeft > 60 ? 'text-amber-600' : 'text-red-600'
 
   const taskLabel = question.task_type === 'task1' ? 'Task 1' : 'Task 2'
-  const hasImage  = question.task_type === 'task1' && !!question.image_url
+  const hasImage = question.task_type === 'task1' && !!question.image_url
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -207,8 +207,8 @@ export default function WritingInterface({ question }: { question: Question }) {
               {submitting
                 ? 'Your essay is being assessed by the AI examiner. This may take up to 30 seconds\u2026'
                 : !meetsMinimum
-                ? `Write ${minWords - wordCount} more word${minWords - wordCount !== 1 ? 's' : ''} to submit.`
-                : 'Ready to submit! Your essay will be marked by the AI examiner.'}
+                  ? `Write ${minWords - wordCount} more word${minWords - wordCount !== 1 ? 's' : ''} to submit.`
+                  : 'Ready to submit! Your essay will be marked by the AI examiner.'}
             </p>
             <button
               onClick={handleSubmit}
@@ -220,7 +220,7 @@ export default function WritingInterface({ question }: { question: Question }) {
                   <LoadingSpinner size="sm" /> Assessing\u2026
                 </span>
               ) : (
-                'Submit for marking \u2192'
+                'Submit for marking'
               )}
             </button>
           </div>

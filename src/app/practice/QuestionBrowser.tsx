@@ -151,8 +151,8 @@ function QuestionCard({ question }: { question: Question }) {
         {preview}{preview.length === 110 ? '\u2026' : ''}
       </p>
 
-      <Link href={`/practice/${question.id}`} className="btn-primary mt-4 text-xs w-full">
-        Start writing \u2192
+      <Link href={`/practice/${question.id}`} className="btn-primary mt-4 text-xs w-full text-center block">
+        Start writing
       </Link>
     </div>
   )

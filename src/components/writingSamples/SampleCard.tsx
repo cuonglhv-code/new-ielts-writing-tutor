@@ -50,9 +50,7 @@ export default function SampleCard({ sample }: SampleCardProps) {
       <h4 className={styles.questionTitle}>Question</h4>
       <p className={styles.questionText}>{sample.question}</p>
 
-      {sample.task === 'task1' && sample.visualType && (
-        <p className={styles.visualHint}>Visual type: {visualLabel(sample.visualType)}</p>
-      )}
+      {/* Visual hint removed as there are no graphics */}
 
       <button className={styles.answerToggle} onClick={() => setExpanded((v) => !v)}>
         {expanded ? 'Hide answer' : 'Show answer'}
