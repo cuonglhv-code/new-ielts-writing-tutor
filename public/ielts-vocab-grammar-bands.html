@@ -440,7 +440,7 @@
     const resultCount = document.getElementById('resultCount');
     const backTop = document.getElementById('backTop');
 
-    const stripRefs = (text) => text.replace(/[^d+]/g, '').trim();
+    const stripRefs = (text) => text.replace(/\[\^\d+\]/g, '').trim();
 
     function usageShort(rawUsage) {
       const lower = rawUsage.toLowerCase();
