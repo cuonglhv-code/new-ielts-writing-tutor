@@ -2,10 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import { Question } from '@/lib/types'
 import { countWords } from '@/lib/utils'
-import LoadingSpinner from '@/components/ui/LoadingSpinner'
 
 const TASK_TIMES: Record<string, number> = {
   task1: 20 * 60,
@@ -14,14 +12,6 @@ const TASK_TIMES: Record<string, number> = {
 const MIN_WORDS: Record<string, number> = {
   task1: 150,
   task2: 250,
-}
-
-const QUESTION_TYPE_LABEL: Record<string, string> = {
-  bar_chart: 'Bar chart', line_graph: 'Line graph', pie_chart: 'Pie chart',
-  table: 'Table', process: 'Process diagram', map: 'Map',
-  opinion: 'Opinion essay', discussion: 'Discussion essay',
-  advantages_disadvantages: 'Adv & Disadv', problem_solution: 'Problem & Solution',
-  double_question: 'Double question', mixed: 'Mixed',
 }
 
 function formatTime(seconds: number) {
@@ -38,14 +28,11 @@ export default function WritingInterface({ question }: { question: Question }) {
   const [essay, setEssay] = useState('')
   const [timeLeft, setTimeLeft] = useState(totalTime)
   const [timerActive, setTimerActive] = useState(true)
-  const [timerDismissed, setTimerDismissed] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
-  const [showImage, setShowImage] = useState(true)
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   const wordCount = countWords(essay)
-  const meetsMinimum = wordCount >= minWords
 
   const tick = useCallback(() => {
     setTimeLeft((prev) => {
@@ -55,15 +42,15 @@ export default function WritingInterface({ question }: { question: Question }) {
   }, [])
 
   useEffect(() => {
-    if (timerActive && !timerDismissed) {
+    if (timerActive) {
       intervalRef.current = setInterval(tick, 1000)
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
-  }, [timerActive, timerDismissed, tick])
+  }, [timerActive, tick])
 
   async function handleSubmit() {
-    if (!meetsMinimum) {
-      setError(`Please write at least ${minWords} words before submitting. Current: ${wordCount} words.`)
+    if (wordCount < 50) {
+      setError(`Please write at least 50 words to submit.`)
       return
     }
     setError('')
@@ -79,153 +66,91 @@ export default function WritingInterface({ question }: { question: Question }) {
       const data = await res.json()
 
       if (!res.ok) {
-        setError(data.error ?? 'Submission failed. Please try again.')
-        setSubmitting(false)
-        return
+        throw new Error(data.error ?? 'Submission failed. Please try again.')
       }
       router.push(`/submission/${data.submissionId}`)
-    } catch {
-      setError('Network error. Please check your connection and try again.')
+    } catch (err: any) {
+      setError(err.message || 'Network error.')
       setSubmitting(false)
     }
   }
 
-  const timerColour =
-    timeLeft > 300 ? 'text-gray-700' : timeLeft > 60 ? 'text-amber-600' : 'text-red-600'
-
-  const taskLabel = question.task_type === 'task1' ? 'Task 1' : 'Task 2'
   const hasImage = question.task_type === 'task1' && !!question.image_url
 
   return (
-    <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div className="grid lg:grid-cols-5 gap-6">
-
-        {/* Left: Question panel */}
-        <div className="lg:col-span-2">
-          <div className="card p-5 sticky top-24">
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              <span className="badge bg-indigo-100 text-indigo-700">{taskLabel}</span>
-              {question.question_type && (
-                <span className="badge bg-violet-100 text-violet-700">
-                  {QUESTION_TYPE_LABEL[question.question_type] ?? question.question_type}
-                </span>
-              )}
-              <span className="badge bg-gray-100 text-gray-600">{question.topic}</span>
-            </div>
-
-            <div className="text-sm text-gray-700 leading-relaxed whitespace-pre-line">
-              {question.question_text}
-            </div>
-
-            {/* Task 1 image */}
-            {hasImage && (
-              <div className="mt-4">
-                <button
-                  onClick={() => setShowImage((v) => !v)}
-                  className="text-xs font-medium text-indigo-600 hover:text-indigo-800 mb-2"
-                >
-                  {showImage ? 'Hide chart' : 'Show chart'}
-                </button>
-                {showImage && (
-                  <Image
-                    src={question.image_url!}
-                    alt="Task 1 chart or diagram"
-                    width={400}
-                    height={280}
-                    className="rounded-lg border border-gray-200 w-full h-auto"
-                    style={{ objectFit: 'contain' }}
-                  />
-                )}
-              </div>
-            )}
-
-            <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-500 space-y-1">
-              <p>\u2022 Minimum {minWords} words</p>
-              <p>\u2022 Recommended time: {question.task_type === 'task1' ? '20' : '40'} minutes</p>
-              {hasImage && <p>\u2022 Refer to the chart above in your response</p>}
-            </div>
-          </div>
+    <div className="max-w-[1400px] mx-auto min-h-[calc(100vh-120px)] flex flex-col bg-[#f0f0f0] border border-gray-300 shadow-md h-full mt-4">
+      {/* CBT Header */}
+      <div className="bg-[#e4e4e4] border-b border-gray-300 p-4 shrink-0 flex justify-between items-center">
+        <div>
+          <h2 className="font-bold text-sm text-gray-900 pb-1">Part {question.task_type === 'task1' ? 1 : 2}</h2>
+          <p className="text-xs text-black font-medium">
+            You should spend about {question.task_type === 'task1' ? 20 : 40} minutes on this task. Write at least {minWords} words.
+          </p>
         </div>
+        <div className="text-right">
+          <div className={`text-xl font-mono font-bold ${timeLeft < 60 ? 'text-red-600' : 'text-gray-800'}`}>
+            {formatTime(timeLeft)}
+          </div>
+          {timeLeft === 0 && <div className="text-xs text-red-600 font-bold">Time's up!</div>}
+        </div>
+      </div>
 
-        {/* Right: Writing area */}
-        <div className="lg:col-span-3 flex flex-col gap-4">
-          {/* Timer */}
-          {!timerDismissed && (
-            <div className={`card px-4 py-3 flex items-center justify-between ${timeLeft === 0 ? 'bg-red-50 border-red-200' : ''}`}>
-              <div className="flex items-center gap-2">
-                <svg className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span className={`font-mono font-semibold text-lg ${timerColour}`}>
-                  {formatTime(timeLeft)}
-                </span>
-                {timeLeft === 0 && (
-                  <span className="text-xs text-red-600 font-medium">Time&apos;s up!</span>
-                )}
-              </div>
-              <button onClick={() => setTimerDismissed(true)} className="text-xs text-gray-400 hover:text-gray-600">
-                Dismiss timer
-              </button>
+      {/* Main Area */}
+      <div className="flex-1 flex flex-col md:flex-row bg-white overflow-hidden">
+        {/* Left side: Question prompt */}
+        <div className="w-full md:w-1/2 md:border-r-2 md:border-gray-300 p-6 sm:p-8 overflow-y-auto">
+          {question.question_text && (
+            <div className="text-sm font-semibold text-gray-900 whitespace-pre-wrap leading-relaxed mb-6 space-y-4">
+              {question.question_text.split('\n').map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
             </div>
           )}
+          {hasImage && (
+            <img
+              src={question.image_url!}
+              alt="Task 1 chart/diagram"
+              className="max-w-full h-auto object-contain border border-gray-200"
+            />
+          )}
+        </div>
 
-          {/* Writing area */}
-          <div className="card p-4 flex flex-col flex-1">
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-medium text-gray-500">Your response</label>
-              <span className={`text-xs font-medium ${meetsMinimum ? 'text-emerald-600' : 'text-gray-400'}`}>
-                {wordCount} / {minWords} words{meetsMinimum ? ' \u2713' : ''}
-              </span>
-            </div>
+        {/* Right side: Writing Area */}
+        <div className="w-full md:w-1/2 bg-white flex flex-col p-4 sm:p-8 min-h-[400px]">
+          <div className="flex-1 w-full flex flex-col relative rounded-sm border border-gray-300 p-1 bg-white focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 transition-all">
             <textarea
               value={essay}
               onChange={(e) => setEssay(e.target.value)}
-              placeholder={`Write your ${taskLabel} response here\u2026`}
-              className="flex-1 w-full min-h-[400px] resize-y text-sm text-gray-800 leading-relaxed p-3 rounded-lg border border-gray-200 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 placeholder-gray-300"
+              placeholder="Start typing your response here..."
+              className="flex-1 w-full bg-white p-2 resize-none outline-none text-[15px] leading-relaxed text-gray-900 border-none"
+              spellCheck={false}
               disabled={submitting}
             />
-          </div>
-
-          {/* Word count bar */}
-          <div className="w-full bg-gray-100 rounded-full h-1.5">
-            <div
-              className={`h-1.5 rounded-full transition-all duration-300 ${meetsMinimum ? 'bg-emerald-500' : 'bg-indigo-400'}`}
-              style={{ width: `${Math.min((wordCount / minWords) * 100, 100)}%` }}
-            />
-          </div>
-
-          {error && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-              {error}
+            <div className="text-xs text-gray-600 p-2 text-right border-t border-gray-100 bg-[#fafafa]">
+              Words: {wordCount}
             </div>
-          )}
-
-          {/* Submit */}
-          <div className="flex items-center justify-between gap-4">
-            <p className="text-xs text-gray-400 flex-1">
-              {submitting
-                ? 'Your essay is being assessed by the AI examiner. This may take up to 30 seconds\u2026'
-                : !meetsMinimum
-                  ? `Write ${minWords - wordCount} more word${minWords - wordCount !== 1 ? 's' : ''} to submit.`
-                  : 'Ready to submit! Your essay will be marked by the AI examiner.'}
-            </p>
-            <button
-              onClick={handleSubmit}
-              disabled={submitting || !meetsMinimum}
-              className="btn-primary whitespace-nowrap"
-            >
-              {submitting ? (
-                <span className="flex items-center gap-2">
-                  <LoadingSpinner size="sm" /> Assessing\u2026
-                </span>
-              ) : (
-                'Submit for marking'
-              )}
-            </button>
           </div>
+          {error && <div className="mt-2 text-xs text-red-600 font-medium">{error}</div>}
         </div>
       </div>
-    </main>
+
+      {/* CBT Footer */}
+      <div className="bg-white border-t border-gray-300 p-3 shrink-0 flex justify-between items-center px-6">
+        <button
+          onClick={() => router.push('/practice')}
+          className="text-sm font-semibold text-gray-600 hover:text-black bg-gray-100 px-4 py-2 hover:bg-gray-200 rounded-md transition-colors"
+        >
+          Exit Practice
+        </button>
+
+        <button
+          onClick={handleSubmit}
+          disabled={submitting}
+          className="flex text-sm items-center gap-2 bg-black hover:bg-gray-800 text-white font-bold px-6 py-2.5 rounded-md transition-colors disabled:opacity-50"
+        >
+          {submitting ? 'Marking...' : <>Submit & Mark <span className="text-lg leading-none">✓</span></>}
+        </button>
+      </div>
+    </div>
   )
 }

@@ -17,7 +17,6 @@ const studentLinks = [
   { href: '/practice', label: 'Practice' },
   { href: '/tips', label: 'IELTS Tips' },
   { href: '/vocab-grammar', label: 'Vocab & Grammar' },
-  { href: '/writing-samples', label: 'Writing Samples' },
 ]
 
 const teacherLinks = [
@@ -26,7 +25,6 @@ const teacherLinks = [
   { href: '/teacher/courses', label: 'Courses' },
   { href: '/tips', label: 'IELTS Tips' },
   { href: '/vocab-grammar', label: 'Vocab & Grammar' },
-  { href: '/writing-samples', label: 'Writing Samples' },
 ]
 
 export default function Navbar({ role, fullName }: NavbarProps) {

@@ -14,27 +14,43 @@ export default function TipsClient({ data }: { data: any }) {
   }, [data, activeTaskId])
 
   // Translation helpers
+  const cleanText = (str: string) => str.replace(/\[[a-zA-Z0-9:]+\]/g, '').trim()
+
+  const renderText = (enTextRaw: string, viTextRaw: string) => {
+    const enText = cleanText(enTextRaw)
+    const viText = cleanText(viTextRaw)
+    if (uiLang === 'en') return <>{enText}</>
+    if (uiLang === 'vi') return <>{viText || enText}</>
+
+    if (viText) return (
+      <span className="flex flex-col">
+        <span>{enText}</span>
+        <span className="text-[0.9em] opacity-75 font-normal mt-0.5">{viText}</span>
+      </span>
+    )
+    return <>{enText}</>
+  }
+
   const tStr = (obj: any, key: string) => {
-    if (!obj) return ''
-    const enText = obj[key] || ''
-    const viText = obj[`${key}_vi`] || ''
-    if (uiLang === 'en') return enText
-    if (uiLang === 'vi') return viText || enText
-    if (viText) return `${enText} / ${viText}`
-    return enText
+    if (!obj) return <></>
+    return renderText(obj[key] || '', obj[`${key}_vi`] || '')
   }
 
   const tArr = (obj: any, key: string) => {
     if (!obj) return []
     const enArr = obj[key] || []
     const viArr = obj[`${key}_vi`] || []
-    return enArr.map((enText: string, idx: number) => {
-      const viText = viArr[idx]
-      if (uiLang === 'en') return enText
-      if (uiLang === 'vi') return viText || enText
-      if (viText) return `${enText} / ${viText}`
-      return enText
-    })
+    return enArr.map((enStr: string, i: number) => renderText(enStr, viArr[i] || ''))
+  }
+
+  const getSearchText = (obj: any, key: string) => {
+    if (!obj) return ''
+    return obj[key] || '' + ' ' + (obj[`${key}_vi`] || '')
+  }
+
+  const getArrSearchText = (obj: any, key: string) => {
+    if (!obj) return ''
+    return (obj[key] || []).join(' ') + ' ' + (obj[`${key}_vi`] || []).join(' ')
   }
 
   // Filter bands
@@ -50,19 +66,19 @@ export default function TipsClient({ data }: { data: any }) {
       // search band profile
       const bp = currentTask.band_profiles.find((b: any) => b.band === bandNum)
       if (bp && (
-        tStr(bp, 'overall_profile').toLowerCase().includes(term) ||
-        tArr(bp, 'key_strengths').join(' ').toLowerCase().includes(term) ||
-        tArr(bp, 'key_weaknesses').join(' ').toLowerCase().includes(term) ||
-        tArr(bp, 'global_upgrade_advice').join(' ').toLowerCase().includes(term)
+        getSearchText(bp, 'overall_profile').toLowerCase().includes(term) ||
+        getArrSearchText(bp, 'key_strengths').toLowerCase().includes(term) ||
+        getArrSearchText(bp, 'key_weaknesses').toLowerCase().includes(term) ||
+        getArrSearchText(bp, 'global_upgrade_advice').toLowerCase().includes(term)
       )) return true
 
       // search criteria
       for (const crit of currentTask.criteria) {
         const critBand = crit.bands.find((b: any) => b.band === bandNum)
         if (critBand && (
-          tStr(critBand, 'descriptor_summary').toLowerCase().includes(term) ||
-          tArr(critBand, 'common_problems').join(' ').toLowerCase().includes(term) ||
-          tArr(critBand, 'upgrade_strategies').join(' ').toLowerCase().includes(term)
+          getSearchText(critBand, 'descriptor_summary').toLowerCase().includes(term) ||
+          getArrSearchText(critBand, 'common_problems').toLowerCase().includes(term) ||
+          getArrSearchText(critBand, 'upgrade_strategies').toLowerCase().includes(term)
         )) return true
       }
       return false
@@ -89,8 +105,8 @@ export default function TipsClient({ data }: { data: any }) {
                   setActiveBand('all')
                 }}
                 className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-colors ${activeTaskId === task.task_id
-                    ? 'bg-white text-indigo-900 shadow-md'
-                    : 'bg-white/10 text-white hover:bg-white/20'
+                  ? 'bg-white text-indigo-900 shadow-md'
+                  : 'bg-white/10 text-white hover:bg-white/20'
                   }`}
               >
                 {tStr(task, 'task_name')}
@@ -134,8 +150,8 @@ export default function TipsClient({ data }: { data: any }) {
             <button
               onClick={() => setActiveBand('all')}
               className={`px-3 py-1.5 rounded-lg text-sm font-medium border whitespace-nowrap ${activeBand === 'all'
-                  ? 'bg-slate-900 text-white border-slate-900'
-                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                ? 'bg-slate-900 text-white border-slate-900'
+                : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                 }`}
             >
               All Bands
@@ -145,8 +161,8 @@ export default function TipsClient({ data }: { data: any }) {
                 key={bandNum}
                 onClick={() => setActiveBand(bandNum)}
                 className={`px-3 py-1.5 rounded-lg text-sm font-medium border whitespace-nowrap ${activeBand === bandNum
-                    ? 'bg-indigo-600 text-white border-indigo-600'
-                    : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                  ? 'bg-indigo-600 text-white border-indigo-600'
+                  : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
                   }`}
               >
                 Band {bandNum}
@@ -201,9 +217,9 @@ export default function TipsClient({ data }: { data: any }) {
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">Target Focus Areas</h4>
                     <ul className="space-y-1">
-                      {tArr(ls, 'focus_areas').map((item: string, i: number) => (
-                        <li key={i} className="text-sm text-gray-700 flex gap-2">
-                          <span className="text-indigo-400">•</span> <span>{item}</span>
+                      {tArr(ls, 'focus_areas').map((item: React.ReactNode, i: number) => (
+                        <li key={i} className="text-sm text-gray-700 flex gap-2 mb-2">
+                          <span className="text-indigo-400 font-bold shrink-0 mt-0.5">•</span> <span>{item}</span>
                         </li>
                       ))}
                     </ul>
@@ -213,9 +229,9 @@ export default function TipsClient({ data }: { data: any }) {
                 <div>
                   <h4 className="text-xs font-bold uppercase tracking-wide text-gray-500 mb-2">Practice Recommendations</h4>
                   <ul className="space-y-1">
-                    {tArr(ls, 'practice_recommendations').map((item: string, i: number) => (
-                      <li key={i} className="text-sm text-gray-700 flex gap-2">
-                        <span className="text-green-500">✓</span> <span>{item}</span>
+                    {tArr(ls, 'practice_recommendations').map((item: React.ReactNode, i: number) => (
+                      <li key={i} className="text-sm text-gray-700 flex gap-2 mb-2">
+                        <span className="text-green-500 font-bold shrink-0 mt-0.5">✓</span> <span>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -226,9 +242,9 @@ export default function TipsClient({ data }: { data: any }) {
                     <span>💡</span> Myths vs Reality
                   </h4>
                   <ul className="space-y-1">
-                    {tArr(ls, 'myths_to_avoid').map((item: string, i: number) => (
-                      <li key={i} className="text-sm text-orange-900 flex gap-2">
-                        <span className="text-orange-500">×</span> <span>{item}</span>
+                    {tArr(ls, 'myths_to_avoid').map((item: React.ReactNode, i: number) => (
+                      <li key={i} className="text-sm text-orange-900 flex gap-2 mb-2">
+                        <span className="text-orange-500 font-bold shrink-0 mt-0.5">×</span> <span>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -266,19 +282,19 @@ function BandProfileCard({ bandNum, currentTask, tStr, tArr, viewMode }: any) {
           <h4 className="flex items-center gap-2 text-sm font-bold text-green-700 mb-3">
             <span className="bg-green-100 w-6 h-6 flex items-center justify-center rounded-full">✓</span> Strengths
           </h4>
-          <ul className="space-y-2">
-            {tArr(profile, 'key_strengths').map((s: string, i: number) => (
-              <li key={i} className="text-sm text-gray-600 flex gap-2"><span className="text-green-400">•</span> {s}</li>
+          <ul className="space-y-4">
+            {tArr(profile, 'key_strengths').map((s: React.ReactNode, i: number) => (
+              <li key={i} className="text-sm text-gray-600 flex gap-2"><span className="text-green-500 font-bold shrink-0 mt-0.5">•</span> <span>{s}</span></li>
             ))}
           </ul>
         </div>
         <div>
-          <h4 className="flex items-center gap-2 text-sm font-bold text-red-700 mb-3">
-            <span className="bg-red-100 w-6 h-6 flex items-center justify-center rounded-full">⚠</span> Weaknesses
+          <h4 className="flex items-center gap-2 text-sm font-bold text-red-700 mb-4">
+            <span className="bg-red-100 w-6 h-6 flex items-center justify-center rounded-full shrink-0">⚠</span> Weaknesses
           </h4>
-          <ul className="space-y-2">
-            {tArr(profile, 'key_weaknesses').map((s: string, i: number) => (
-              <li key={i} className="text-sm text-gray-600 flex gap-2"><span className="text-red-400">•</span> {s}</li>
+          <ul className="space-y-4">
+            {tArr(profile, 'key_weaknesses').map((s: React.ReactNode, i: number) => (
+              <li key={i} className="text-sm text-gray-600 flex gap-2"><span className="text-red-500 font-bold shrink-0 mt-0.5">•</span> <span>{s}</span></li>
             ))}
           </ul>
         </div>
@@ -291,8 +307,8 @@ function BandProfileCard({ bandNum, currentTask, tStr, tArr, viewMode }: any) {
         </summary>
         <div className="p-3 pt-0 border-t border-indigo-100">
           <ul className="space-y-2 mt-2">
-            {tArr(profile, 'global_upgrade_advice').map((s: string, i: number) => (
-              <li key={i} className="text-sm text-indigo-800 flex gap-2"><span className="text-indigo-400">→</span> {s}</li>
+            {tArr(profile, 'global_upgrade_advice').map((s: React.ReactNode, i: number) => (
+              <li key={i} className="text-sm text-indigo-800 flex gap-2 mb-3"><span className="text-indigo-400 mt-0.5 shrink-0">→</span> <span>{s}</span></li>
             ))}
           </ul>
         </div>
@@ -329,10 +345,11 @@ function CriteriaDrillDown({ bandNum, currentTask, tStr, tArr, viewMode }: any) 
                     <p className={`text-xs font-bold uppercase tracking-wide mb-2 flex items-center gap-1 ${viewMode === 'teacher' ? 'text-red-800' : 'text-gray-500'}`}>
                       {viewMode === 'teacher' ? '⚠️ Common Problems (Diagnostic)' : 'Common Traps'}
                     </p>
-                    <ul className="space-y-1.5">
-                      {tArr(critBand, 'common_problems').map((s: string, i: number) => (
+                    <ul className="space-y-3">
+                      {tArr(critBand, 'common_problems').map((s: React.ReactNode, i: number) => (
                         <li key={i} className={`text-sm flex gap-2 ${viewMode === 'teacher' ? 'text-red-900' : 'text-gray-600'}`}>
-                          <span className={viewMode === 'teacher' ? 'text-red-400' : 'text-red-300'}>×</span> <span>{s}</span>
+                          <span className={`${viewMode === 'teacher' ? 'text-red-400' : 'text-red-300'} font-bold shrink-0 mt-0.5`}>×</span>
+                          <span>{s}</span>
                         </li>
                       ))}
                     </ul>
@@ -343,10 +360,11 @@ function CriteriaDrillDown({ bandNum, currentTask, tStr, tArr, viewMode }: any) 
                   <p className={`text-xs font-bold uppercase tracking-wide mb-2 flex items-center gap-1 ${viewMode === 'student' ? 'text-green-800' : 'text-gray-500'}`}>
                     {viewMode === 'student' ? '🚀 Upgrade Strategies (Actionable)' : 'Upgrade Strategies'}
                   </p>
-                  <ul className="space-y-1.5">
-                    {tArr(critBand, 'upgrade_strategies').map((s: string, i: number) => (
+                  <ul className="space-y-3">
+                    {tArr(critBand, 'upgrade_strategies').map((s: React.ReactNode, i: number) => (
                       <li key={i} className={`text-sm flex gap-2 ${viewMode === 'student' ? 'text-green-900' : 'text-gray-600'}`}>
-                        <span className={viewMode === 'student' ? 'text-green-500' : 'text-green-400'}>↑</span> <span>{s}</span>
+                        <span className={`${viewMode === 'student' ? 'text-green-500' : 'text-green-400'} font-bold shrink-0 mt-0.5`}>↑</span>
+                        <span>{s}</span>
                       </li>
                     ))}
                   </ul>
