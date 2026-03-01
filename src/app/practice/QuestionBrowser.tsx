@@ -5,14 +5,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Question } from '@/lib/types'
 
-const DIFFICULTIES   = ['All', 'Band 5-6', 'Band 6-7', 'Band 7-8']
-const TASK_TYPES     = ['All', 'task1', 'task2']
+const TASK_TYPES = ['All', 'task1', 'task2']
 const TOPICS = [
-  'All','Education','Environment','Health','Society',
-  'Technology','Transport','Economy','Other',
+  'All', 'Education', 'Environment', 'Health', 'Society',
+  'Technology', 'Transport', 'Economy', 'Other',
 ]
-const TASK1_TYPES = ['All','bar_chart','line_graph','pie_chart','table','process','map','mixed']
-const TASK2_TYPES = ['All','opinion','discussion','advantages_disadvantages','problem_solution','double_question','mixed']
+const TASK1_TYPES = ['All', 'bar_chart', 'line_graph', 'pie_chart', 'table', 'process', 'map', 'mixed']
+const TASK2_TYPES = ['All', 'opinion', 'discussion', 'advantages_disadvantages', 'problem_solution', 'double_question', 'mixed']
 
 const difficultyColour: Record<string, string> = {
   'Band 5-6': 'bg-green-100 text-green-700',
@@ -29,21 +28,19 @@ const QUESTION_TYPE_LABEL: Record<string, string> = {
 }
 
 export default function QuestionBrowser({ questions }: { questions: Question[] }) {
-  const [taskFilter, setTaskFilter]   = useState('All')
-  const [diffFilter, setDiffFilter]   = useState('All')
+  const [taskFilter, setTaskFilter] = useState('All')
   const [topicFilter, setTopicFilter] = useState('All')
-  const [typeFilter, setTypeFilter]   = useState('All')
+  const [typeFilter, setTypeFilter] = useState('All')
 
   const questionTypeOptions =
     taskFilter === 'task1' ? TASK1_TYPES :
-    taskFilter === 'task2' ? TASK2_TYPES :
-    ['All']
+      taskFilter === 'task2' ? TASK2_TYPES :
+        ['All']
 
   const filtered = questions.filter((q) => {
-    if (taskFilter  !== 'All' && q.task_type  !== taskFilter)  return false
-    if (diffFilter  !== 'All' && q.difficulty !== diffFilter)  return false
-    if (topicFilter !== 'All' && q.topic      !== topicFilter) return false
-    if (typeFilter  !== 'All' && q.question_type !== typeFilter) return false
+    if (taskFilter !== 'All' && q.task_type !== taskFilter) return false
+    if (topicFilter !== 'All' && q.topic !== topicFilter) return false
+    if (typeFilter !== 'All' && q.question_type !== typeFilter) return false
     return true
   })
 
@@ -57,7 +54,6 @@ export default function QuestionBrowser({ questions }: { questions: Question[] }
           onChange={(v) => { setTaskFilter(v); setTypeFilter('All') }}
           labelMap={{ All: 'All types', task1: 'Task 1', task2: 'Task 2' }}
         />
-        <FilterGroup label="Difficulty" options={DIFFICULTIES} value={diffFilter} onChange={setDiffFilter} />
         <FilterGroup label="Topic" options={TOPICS} value={topicFilter} onChange={setTopicFilter} />
         {taskFilter !== 'All' && (
           <FilterGroup
@@ -100,11 +96,10 @@ function FilterGroup({
           <button
             key={opt}
             onClick={() => onChange(opt)}
-            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-              value === opt
+            className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${value === opt
                 ? 'bg-indigo-600 text-white border-indigo-600'
                 : 'bg-white text-gray-600 border-gray-300 hover:border-indigo-400'
-            }`}
+              }`}
           >
             {labelMap?.[opt] ?? opt}
           </button>

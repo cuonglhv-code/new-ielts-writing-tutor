@@ -11,6 +11,7 @@ interface NavbarProps {
 }
 
 const studentLinks = [
+  { href: '/submission', label: 'Submission' },
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/courses', label: 'Courses' },
   { href: '/practice', label: 'Practice' },
@@ -46,7 +47,7 @@ export default function Navbar({ role, fullName }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href={role === 'teacher' ? '/teacher' : '/dashboard'} className="flex items-center gap-2">
+          <Link href={role === 'teacher' ? '/teacher' : '/submission'} className="flex items-center gap-2">
             <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center">
               <span className="text-white font-bold text-sm">J</span>
             </div>
@@ -63,11 +64,10 @@ export default function Navbar({ role, fullName }: NavbarProps) {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-indigo-50 text-indigo-700'
-                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${isActive
+                    ? 'bg-indigo-50 text-indigo-700'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -105,11 +105,10 @@ export default function Navbar({ role, fullName }: NavbarProps) {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                  isActive
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                }`}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${isActive
+                  ? 'bg-indigo-50 text-indigo-700'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
               >
                 {link.label}
               </Link>
