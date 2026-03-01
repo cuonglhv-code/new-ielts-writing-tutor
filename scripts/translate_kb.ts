@@ -18,7 +18,7 @@ Input Array:
 ${JSON.stringify(texts, null, 2)}`;
 
     const message = await anthropic.messages.create({
-        model: 'claude-3-5-haiku-20241022',
+        model: 'claude-3-sonnet-20240229',
         max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }]
     });
@@ -59,7 +59,8 @@ async function processObject(obj: any): Promise<any> {
                     try {
                         const translated = await translateText([val]);
                         newObj[`${key}_vi`] = translated[0] || val;
-                    } catch {
+                    } catch (err) {
+                        console.error('API Error for key:', key, err);
                         newObj[`${key}_vi`] = val;
                     }
                 } else if (Array.isArray(val) && val.every(v => typeof v === 'string')) {
@@ -67,7 +68,8 @@ async function processObject(obj: any): Promise<any> {
                     try {
                         const translated = await translateText(val);
                         newObj[`${key}_vi`] = translated.length === val.length ? translated : val;
-                    } catch {
+                    } catch (err) {
+                        console.error('API Error for string array:', key, err);
                         newObj[`${key}_vi`] = val;
                     }
                 }
