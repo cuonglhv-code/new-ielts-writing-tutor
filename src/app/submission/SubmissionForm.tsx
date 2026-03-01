@@ -8,6 +8,7 @@ export default function SubmissionForm() {
     const [questionText, setQuestionText] = useState('')
     const [essayText, setEssayText] = useState('')
     const [taskType, setTaskType] = useState('task2')
+    const [attachedFile, setAttachedFile] = useState<{ type: string, data: string, name: string } | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
     const router = useRouter()
 
@@ -15,15 +16,22 @@ export default function SubmissionForm() {
         const file = e.target.files?.[0]
         if (!file) return
 
-        // For plain text files
         if (file.type === 'text/plain') {
             const text = await file.text()
             setQuestionText(text)
+        } else if (file.type === 'application/pdf' || file.type.startsWith('image/')) {
+            const reader = new FileReader()
+            reader.onload = () => {
+                const base64Data = (reader.result as string).split(',')[1]
+                setAttachedFile({
+                    type: file.type,
+                    data: base64Data,
+                    name: file.name
+                })
+            }
+            reader.readAsDataURL(file)
         } else {
-            // Basic fallback: just show the file name as a placeholder,
-            // in a real app we would send to an API to extract text (e.g. PDF/Word)
-            // Since we don't have a backend parser, we just alert
-            alert('Currently only plain text (.txt) files are supported for direct reading in this demo. Please copy-paste the question text.')
+            alert('Unsupported file type. Please upload a .txt, image, or .pdf file.')
         }
     }
 
@@ -47,7 +55,8 @@ export default function SubmissionForm() {
                 body: JSON.stringify({
                     questionText,
                     essayText,
-                    taskType
+                    taskType,
+                    attachedFile
                 })
             })
 
@@ -93,17 +102,28 @@ export default function SubmissionForm() {
                                 type="file"
                                 id="file-upload"
                                 className="hidden"
-                                accept=".txt"
+                                accept=".txt,image/*,.pdf"
                                 onChange={handleFileUpload}
                             />
                             <label
                                 htmlFor="file-upload"
                                 className="cursor-pointer text-sm text-indigo-600 hover:text-indigo-800"
                             >
-                                + Attach a file (.txt)
+                                + Attach file (.txt, image, .pdf)
                             </label>
                         </div>
                     </div>
+                    {attachedFile && (
+                        <div className="mb-2 text-sm text-green-600 flex items-center gap-2">
+                            <span>Attached: <strong>{attachedFile.name}</strong></span>
+                            <button
+                                onClick={() => setAttachedFile(null)}
+                                className="text-red-500 hover:text-red-700 underline text-xs"
+                            >
+                                Remove
+                            </button>
+                        </div>
+                    )}
                     <textarea
                         value={questionText}
                         onChange={(e) => setQuestionText(e.target.value)}

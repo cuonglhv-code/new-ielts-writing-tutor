@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { questionText, essayText, taskType } = body
+    const { questionText, essayText, taskType, attachedFile } = body
 
     if (!questionText?.trim() || !essayText?.trim()) {
       return NextResponse.json(
@@ -159,11 +159,40 @@ ${question.question_text}`
 
     let claudeResponse: string
     try {
+      const userContent: any[] = []
+
+      if (attachedFile) {
+        if (attachedFile.type === 'application/pdf') {
+          userContent.push({
+            type: 'document',
+            source: {
+              type: 'base64',
+              media_type: 'application/pdf',
+              data: attachedFile.data,
+            },
+          })
+        } else if (attachedFile.type.startsWith('image/')) {
+          userContent.push({
+            type: 'image',
+            source: {
+              type: 'base64',
+              media_type: attachedFile.type,
+              data: attachedFile.data,
+            },
+          })
+        }
+      }
+
+      userContent.push({
+        type: 'text',
+        text: userMessage,
+      })
+
       const message = await anthropic.messages.create({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-3-5-sonnet-20241022',
         max_tokens: 6000,
         system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: userMessage }],
+        messages: [{ role: 'user', content: userContent }],
       })
 
       claudeResponse =
