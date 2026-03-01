@@ -4,24 +4,6 @@ import path from 'path'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
 import TipsClient from './TipsClient'
-import type { GuideData } from './types'
-
-async function loadGuideData(): Promise<GuideData> {
-  const guidePath = path.join(process.cwd(), 'IELTS-Writing-Guide.md')
-  const markdown = await fs.readFile(guidePath, 'utf8')
-  const match = markdown.match(/## JSON Data for the App\s+```json\s*([\s\S]*?)\s*```/)
-
-  if (!match?.[1]) {
-    throw new Error('JSON block not found in IELTS-Writing-Guide.md')
-  }
-
-  const parsed = JSON.parse(match[1]) as GuideData
-  if (!parsed.tasks || !Array.isArray(parsed.tasks) || parsed.tasks.length === 0) {
-    throw new Error('Invalid guide JSON data')
-  }
-
-  return parsed
-}
 
 export default async function TipsPage() {
   const supabase = createClient()
@@ -40,14 +22,16 @@ export default async function TipsPage() {
 
   if (!profile?.full_name) redirect('/onboarding')
 
-  const guideData = await loadGuideData()
+  // Load the new JSON KB
+  const kbPath = path.join(process.cwd(), 'src', 'lib', 'ielts_acad_writing_kb_bilingual.json')
+  const kbData = JSON.parse(await fs.readFile(kbPath, 'utf8'))
 
   return (
     <>
       <Navbar role={profile.role} fullName={profile.full_name} />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        <TipsClient data={guideData} />
+        <TipsClient data={kbData} />
       </main>
     </>
   )
