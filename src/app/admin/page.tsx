@@ -57,15 +57,14 @@ export default async function AdminPage() {
         range25to34: 0,
         plus35: 0,
         unknown: 0
-    }
-
-        (students as StudentProfile[] | null)?.forEach((s: StudentProfile) => {
-            if (!s.age) demographics.unknown++
-            else if (s.age < 18) demographics.under18++
-            else if (s.age <= 24) demographics.range18to24++
-            else if (s.age <= 34) demographics.range25to34++
-            else demographics.plus35++
-        })
+    };
+    (students as StudentProfile[] | null)?.forEach((s: StudentProfile) => {
+        if (!s.age) demographics.unknown++
+        else if (s.age < 18) demographics.under18++
+        else if (s.age <= 24) demographics.range18to24++
+        else if (s.age <= 34) demographics.range25to34++
+        else demographics.plus35++
+    })
 
     const stats = {
         studentCount: studentCount || 0,
