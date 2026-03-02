@@ -1,9 +1,7 @@
 import { redirect } from 'next/navigation'
-import fs from 'fs/promises'
-import path from 'path'
 import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
-import TipsClient from './TipsClient'
+import NewTipsClient from './NewTipsClient'
 
 export default async function TipsPage() {
   const supabase = createClient()
@@ -22,16 +20,14 @@ export default async function TipsPage() {
 
   if (!profile?.full_name) redirect('/onboarding')
 
-  // Load the new JSON KB
-  const kbPath = path.join(process.cwd(), 'src', 'lib', 'ielts_acad_writing_kb_bilingual.json')
-  const kbData = JSON.parse(await fs.readFile(kbPath, 'utf8'))
+  const { data: tips } = await supabase.from('tips').select('*')
 
   return (
     <>
       <Navbar role={profile.role} fullName={profile.full_name} />
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
-        <TipsClient data={kbData} />
+        <NewTipsClient tips={tips || []} />
       </main>
     </>
   )
