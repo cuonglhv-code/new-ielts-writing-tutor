@@ -1,6 +1,13 @@
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import AdminDashboard from '@/components/admin/AdminDashboard'
+
+interface StudentProfile {
+    full_name: string | null
+    age: number | null
+    background: string | null
+    created_at: string
+}
 
 export default async function AdminPage() {
     const supabase = createClient()
@@ -36,7 +43,7 @@ export default async function AdminPage() {
 
     const totalPractices = submissions?.length || 0
     const avgScore = totalPractices > 0
-        ? (submissions!.reduce((acc, curr) => acc + (curr.overall_band || 0), 0) / totalPractices).toFixed(2)
+        ? (submissions!.reduce((acc: number, curr: any) => acc + (curr.overall_band || 0), 0) / totalPractices).toFixed(2)
         : 'N/A'
 
     const { data: students } = await supabase
@@ -52,13 +59,13 @@ export default async function AdminPage() {
         unknown: 0
     }
 
-    students?.forEach(s => {
-        if (!s.age) demographics.unknown++
-        else if (s.age < 18) demographics.under18++
-        else if (s.age <= 24) demographics.range18to24++
-        else if (s.age <= 34) demographics.range25to34++
-        else demographics.plus35++
-    })
+        (students as StudentProfile[] | null)?.forEach((s: StudentProfile) => {
+            if (!s.age) demographics.unknown++
+            else if (s.age < 18) demographics.under18++
+            else if (s.age <= 24) demographics.range18to24++
+            else if (s.age <= 34) demographics.range25to34++
+            else demographics.plus35++
+        })
 
     const stats = {
         studentCount: studentCount || 0,
@@ -69,7 +76,7 @@ export default async function AdminPage() {
     }
 
     // Prepare export data
-    const exportData = students?.map(s => ({
+    const exportData = (students as StudentProfile[] | null)?.map((s: StudentProfile) => ({
         FullName: s.full_name,
         Age: s.age,
         Background: s.background,
