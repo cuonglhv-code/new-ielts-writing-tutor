@@ -1,0 +1,93 @@
+
+{
+  "task1": {
+    "general_tips": {
+      "title": "General Tips for IELTS Writing Task 1",
+      "content": [
+        {
+          "type": "paragraph",
+          "text": "The first thing you need to know is the difference between the Academic and General Training papers. The Academic paper is for students who want to study at a university in an English-speaking country. The General Training paper is for people who want to work or migrate to an English-speaking country. The Task 1 for each paper is different."
+        },
+        {
+          "type": "list",
+          "items": [
+            "Academic: You will be given a graph, chart, or diagram and asked to describe it in your own words.",
+            "General Training: You will be given a situation and asked to write a letter."
+          ]
+        }
+      ]
+    },
+    "academic": [
+      {
+        "title": "Bar Chart",
+        "url": "https://ieltsliz.com/ielts-bar-charts-vocabulary/",
+        "content": "This lesson will help you to describe bar charts and includes vocabulary and model answers."
+      },
+      {
+        "title": "Line Graph",
+        "url": "https://ieltsliz.com/ielts-line-graph-vocabulary/",
+        "content": "Learn how to describe line graphs, the vocabulary needed and see a model answer."
+      },
+      {
+        "title": "Table",
+        "url": "https://ieltsliz.com/ielts-table-lessons/",
+        "content": "This page gives you a list of all lessons and tips for writing task 1 tables."
+      },
+      {
+        "title": "Pie Chart",
+        "url": "https://ieltsliz.com/ielts-pie-chart-vocabulary/",
+        "content": "Learn useful vocabulary for describing pie charts and see a model answer."
+      },
+      {
+        "title": "Process Diagram",
+        "url": "https://ieltsliz.com/ielts-process-diagram-vocabulary/",
+        "content": "Learn how to describe a process diagram and the vocabulary needed for it."
+      },
+      {
+        "title": "Maps",
+        "url": "https://ieltsliz.com/ielts-maps-vocabulary/",
+        "content": "This lesson will show you how to describe maps for IELTS writing task 1."
+      }
+    ],
+    "general_training": [
+      {
+        "title": "Letter Writing",
+        "url": "https://ieltsliz.com/ielts-letter-writing-tips/",
+        "content": "Learn how to write a formal and informal letter for your GT test."
+      }
+    ]
+  },
+  "task2": {
+    "general_tips": {
+      "title": "General Tips for IELTS Writing Task 2",
+      "content": "This page has a list of all my task 2 lessons and tips. It is a long page, so please scroll down to find what you need."
+    },
+    "essay_types": [
+      {
+        "title": "Agree / Disagree",
+        "url": "https://ieltsliz.com/ielts-agree-disagree-essay-sample-answer/",
+        "content": "This lesson will show you how to write an agree/disagree essay."
+      },
+      {
+        "title": "Advantages / Disadvantages",
+        "url": "https://ieltsliz.com/advantages-and-disadvantages-essay-lesson/",
+        "content": "Learn how to write an advantages and disadvantages essay."
+      },
+      {
+        "title": "Cause / Solution",
+        "url": "https://ieltsliz.com/ielts-cause-solution-essay-model-answer/",
+        "content": "This page shows you how to structure a cause and solution essay."
+      },
+      {
+        "title": "Opinion",
+        "url": "https://ieltsliz.com/ielts-opinion-essay-sample-answer/",
+        "content": "Learn how to give your opinion in an IELTS writing task 2 essay."
+      },
+      {
+        "title": "Discussion",
+        "url": "https://ieltsliz.com/ielts-discussion-essay-sample-answer/",
+        "content": "This lesson will show you how to write a discussion essay."
+      }
+    ]
+  }
+}
